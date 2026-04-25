@@ -22,7 +22,7 @@ export default function Page() {
   const { screen, handoffMessage, setHandoff } = useApp();
   // Collapse the Scan/Pay/Receive sibling screens into one key so switching
   // tabs inside ScanScreen doesn't trigger a slide animation.
-  const animKey = screen === "pay" || screen === "receive" ? "scan" : screen === "money-packet" || screen === "gift" ? "transfer-recipient" : screen;
+  const animKey = screen === "pay" || screen === "receive" ? "scan" : screen === "money-packet" || screen === "gift" || screen === "transfer-receive" ? "transfer-recipient" : screen;
   useEffect(() => {
     if (handoffMessage) {
       const t = setTimeout(() => setHandoff(undefined), 5000);
@@ -46,9 +46,9 @@ export default function Page() {
               className="h-full w-full absolute inset-0"
             >
               {screen === "home" && <WalletHome />}
-              {(screen === "transfer-recipient" || screen === "money-packet" || screen === "gift") && (
+              {(screen === "transfer-recipient" || screen === "money-packet" || screen === "gift" || screen === "transfer-receive") && (
                 <TransferRecipient
-                  initialTab={screen === "money-packet" ? "Money Packet" : screen === "gift" ? "Gift" : "Transfer"}
+                  initialTab={screen === "transfer-receive" ? "Receive" : screen === "money-packet" ? "Money Packet" : screen === "gift" ? "Gift" : "Transfer"}
                 />
               )}
               {screen === "transfer-money" && <TransferMoney />}

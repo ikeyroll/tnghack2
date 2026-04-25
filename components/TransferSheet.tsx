@@ -32,7 +32,7 @@ export default function TransferSheet() {
                 icon={<QrCode className="w-6 h-6 text-tng-blue" />}
                 title="Receive money"
                 sub="Show your DuitNow QR to receive money"
-                onClick={() => { setShowTransferSheet(false); setScreen("receive"); }}
+                onClick={() => { setShowTransferSheet(false); setScreen("transfer-receive"); }}
               />
               <Row
                 icon={<Wallet className="w-6 h-6 text-tng-blue" />}

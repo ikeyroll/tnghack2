@@ -18,7 +18,8 @@ export type Screen =
   | "scan"
   | "pay"
   | "money-packet"
-  | "gift";
+  | "gift"
+  | "transfer-receive";
 
 export type ActionLogEntry = {
   id: string;

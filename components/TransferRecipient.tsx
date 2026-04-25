@@ -62,7 +62,7 @@ export default function TransferRecipient({ initialTab = "Transfer" }: { initial
                 setTab(t);
                 // Keep screen state in sync for navigation consistency
                 if (t === "Transfer") setScreen("transfer-recipient");
-                else if (t === "Receive") setScreen("transfer-recipient");
+                else if (t === "Receive") setScreen("transfer-receive");
                 else if (t === "Money Packet") setScreen("money-packet");
                 else if (t === "Gift") setScreen("gift");
               }}
