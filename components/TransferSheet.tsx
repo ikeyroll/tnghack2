@@ -38,11 +38,13 @@ export default function TransferSheet() {
                 icon={<Wallet className="w-6 h-6 text-tng-blue" />}
                 title="Money Packet"
                 sub="Share random or fixed amount with anyone"
+                onClick={() => { setShowTransferSheet(false); setScreen("money-packet"); }}
               />
               <Row
                 icon={<Gift className="w-6 h-6 text-tng-blue" />}
                 title="Gift"
                 sub="Send gift with a custom message"
+                onClick={() => { setShowTransferSheet(false); setScreen("gift"); }}
               />
             </div>
           </motion.div>

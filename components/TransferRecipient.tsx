@@ -29,9 +29,11 @@ function FakeQR({ size = 176, color = "black" }: { size?: number; color?: string
   );
 }
 
-export default function TransferRecipient() {
+export type TransferTab = (typeof TABS)[number];
+
+export default function TransferRecipient({ initialTab = "Transfer" }: { initialTab?: TransferTab }) {
   const { setScreen, startTransfer, balance } = useApp();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Transfer");
+  const [tab, setTab] = useState<TransferTab>(initialTab);
   const [method, setMethod] = useState<(typeof METHODS)[number]>("eWallet");
   const [q, setQ] = useState("");
 
@@ -56,7 +58,14 @@ export default function TransferRecipient() {
           {TABS.map((t) => (
             <button
               key={t}
-              onClick={() => setTab(t)}
+              onClick={() => {
+                setTab(t);
+                // Keep screen state in sync for navigation consistency
+                if (t === "Transfer") setScreen("transfer-recipient");
+                else if (t === "Receive") setScreen("transfer-recipient");
+                else if (t === "Money Packet") setScreen("money-packet");
+                else if (t === "Gift") setScreen("gift");
+              }}
               className={`text-sm pb-2 ${tab === t ? "font-semibold border-b-2 border-yellow-400" : "text-white/80"}`}
             >
               {t}

@@ -16,7 +16,9 @@ export type Screen =
   | "donation"
   | "cashloan"
   | "scan"
-  | "pay";
+  | "pay"
+  | "money-packet"
+  | "gift";
 
 export type ActionLogEntry = {
   id: string;
