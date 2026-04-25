@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.tango.wallet.wear-mergeDebugResources-45:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "/Users/rylin/.gradle/caches/9.4.1/transforms/9be2e911c46819064d631d4fa7cca2d5/transformed/core-splashscreen-1.2.0/res/values-v30/values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "7",
+                        "endColumns": "12",
+                        "endOffsets": "433"
+                    }
+                }
+            ]
+        }
+    ]
+}

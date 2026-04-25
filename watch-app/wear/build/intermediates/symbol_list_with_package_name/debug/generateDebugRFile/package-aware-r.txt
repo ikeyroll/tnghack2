@@ -1,0 +1,11 @@
+com.tango.wallet.wear
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+drawable splash_icon
+drawable tango_logo
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string hello_world
+style MainActivityTheme_Starting
+xml network_security_config

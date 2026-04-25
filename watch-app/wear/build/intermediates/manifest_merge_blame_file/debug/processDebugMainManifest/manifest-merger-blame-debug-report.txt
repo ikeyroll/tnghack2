@@ -1,0 +1,204 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.tango.wallet.wear"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+7-->INJECTED
+8        android:minSdkVersion="33"
+8-->INJECTED
+9        android:targetSdkVersion="36" />
+9-->INJECTED
+10
+11    <uses-permission android:name="android.permission.WAKE_LOCK" />
+11-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:4:5-68
+11-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:4:22-65
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:5:5-67
+12-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:5:22-64
+13    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+13-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:6:5-77
+13-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:6:22-74
+14    <uses-permission android:name="android.permission.VIBRATE" />
+14-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:7:5-66
+14-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:7:22-63
+15
+16    <uses-feature android:name="android.hardware.type.watch" />
+16-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:9:5-64
+16-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:9:19-61
+17
+18    <permission
+18-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:22:5-24:47
+19        android:name="com.tango.wallet.wear.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+19-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:23:9-81
+20        android:protectionLevel="signature" />
+20-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:24:9-44
+21
+22    <uses-permission android:name="com.tango.wallet.wear.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+22-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:26:5-97
+22-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:26:22-94
+23
+24    <application
+24-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:11:5-44:19
+25        android:allowBackup="true"
+25-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:12:9-35
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.18.0] /Users/rylin/.gradle/caches/9.4.1/transforms/7fc1d6fd37667bf33acd5f12373ab848/transformed/core-1.18.0/AndroidManifest.xml:28:18-86
+27        android:debuggable="true"
+28        android:extractNativeLibs="false"
+28-->INJECTED
+29        android:icon="@mipmap/ic_launcher"
+29-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:13:9-43
+30        android:label="Tango"
+30-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:14:9-30
+31        android:networkSecurityConfig="@xml/network_security_config"
+31-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:16:9-69
+32        android:supportsRtl="true"
+32-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:15:9-35
+33        android:testOnly="true"
+34        android:theme="@android:style/Theme.DeviceDefault" >
+34-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:17:9-59
+35        <uses-library
+35-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:18:9-20:39
+36            android:name="com.google.android.wearable"
+36-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:19:13-55
+37            android:required="true" />
+37-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:20:13-36
+38        <uses-library
+38-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:21:9-23:40
+39            android:name="wear-sdk"
+39-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:22:13-36
+40            android:required="false" />
+40-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:23:13-37
+41
+42        <!--
+43               Set to true if your app is Standalone, that is, it does not require the handheld
+44               app to run.
+45        -->
+46        <meta-data
+46-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:29:9-31:36
+47            android:name="com.google.android.wearable.standalone"
+47-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:30:13-66
+48            android:value="true" />
+48-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:31:13-33
+49
+50        <activity
+50-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:33:9-43:20
+51            android:name="com.tango.wallet.wear.presentation.MainActivity"
+51-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:34:13-54
+52            android:exported="true"
+52-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:35:13-36
+53            android:taskAffinity=""
+53-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:36:13-36
+54            android:theme="@style/MainActivityTheme.Starting" >
+54-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:37:13-62
+55            <intent-filter>
+55-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:38:13-42:29
+56                <action android:name="android.intent.action.MAIN" />
+56-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:39:17-69
+56-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:39:25-66
+57
+58                <category android:name="android.intent.category.LAUNCHER" />
+58-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:41:17-77
+58-->/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/src/main/AndroidManifest.xml:41:27-74
+59            </intent-filter>
+60        </activity>
+61        <activity
+61-->[com.google.android.gms:play-services-base:18.5.0] /Users/rylin/.gradle/caches/9.4.1/transforms/a19b50b3f93cc92e80732a23a47f855b/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+62            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+62-->[com.google.android.gms:play-services-base:18.5.0] /Users/rylin/.gradle/caches/9.4.1/transforms/a19b50b3f93cc92e80732a23a47f855b/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+63            android:exported="false"
+63-->[com.google.android.gms:play-services-base:18.5.0] /Users/rylin/.gradle/caches/9.4.1/transforms/a19b50b3f93cc92e80732a23a47f855b/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+64            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+64-->[com.google.android.gms:play-services-base:18.5.0] /Users/rylin/.gradle/caches/9.4.1/transforms/a19b50b3f93cc92e80732a23a47f855b/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+65        <activity
+65-->[androidx.compose.ui:ui-test-manifest:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/f488358edb6b86914b1dd81e9e738f1b/transformed/ui-test-manifest-1.9.2/AndroidManifest.xml:23:9-26:79
+66            android:name="androidx.activity.ComponentActivity"
+66-->[androidx.compose.ui:ui-test-manifest:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/f488358edb6b86914b1dd81e9e738f1b/transformed/ui-test-manifest-1.9.2/AndroidManifest.xml:24:13-63
+67            android:exported="true"
+67-->[androidx.compose.ui:ui-test-manifest:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/f488358edb6b86914b1dd81e9e738f1b/transformed/ui-test-manifest-1.9.2/AndroidManifest.xml:25:13-36
+68            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+68-->[androidx.compose.ui:ui-test-manifest:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/f488358edb6b86914b1dd81e9e738f1b/transformed/ui-test-manifest-1.9.2/AndroidManifest.xml:26:13-76
+69        <activity
+69-->[androidx.compose.ui:ui-tooling-android:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/c2a9a7f5aacd362e2b5cd337b9b2945d/transformed/ui-tooling/AndroidManifest.xml:23:9-25:39
+70            android:name="androidx.compose.ui.tooling.PreviewActivity"
+70-->[androidx.compose.ui:ui-tooling-android:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/c2a9a7f5aacd362e2b5cd337b9b2945d/transformed/ui-tooling/AndroidManifest.xml:24:13-71
+71            android:exported="true" />
+71-->[androidx.compose.ui:ui-tooling-android:1.9.2] /Users/rylin/.gradle/caches/9.4.1/transforms/c2a9a7f5aacd362e2b5cd337b9b2945d/transformed/ui-tooling/AndroidManifest.xml:25:13-36
+72
+73        <provider
+73-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
+74            android:name="androidx.startup.InitializationProvider"
+74-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
+75            android:authorities="com.tango.wallet.wear.androidx-startup"
+75-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
+76            android:exported="false" >
+76-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
+77            <meta-data
+77-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
+78                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+78-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
+79                android:value="androidx.startup" />
+79-->[androidx.emoji2:emoji2:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/9bfd4664d7eb915f2fcbdc08ade21e8e/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
+80            <meta-data
+80-->[androidx.lifecycle:lifecycle-process:2.9.4] /Users/rylin/.gradle/caches/9.4.1/transforms/8cadb4e593ce11f6dd9315ac081439a6/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:29:13-31:52
+81                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+81-->[androidx.lifecycle:lifecycle-process:2.9.4] /Users/rylin/.gradle/caches/9.4.1/transforms/8cadb4e593ce11f6dd9315ac081439a6/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:30:17-78
+82                android:value="androidx.startup" />
+82-->[androidx.lifecycle:lifecycle-process:2.9.4] /Users/rylin/.gradle/caches/9.4.1/transforms/8cadb4e593ce11f6dd9315ac081439a6/transformed/lifecycle-process-2.9.4/AndroidManifest.xml:31:17-49
+83            <meta-data
+83-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+84                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+84-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+85                android:value="androidx.startup" />
+85-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+86        </provider>
+87
+88        <meta-data
+88-->[com.google.android.gms:play-services-basement:18.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/6c0b78089915c6f2e271d25383fba8f6/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+89            android:name="com.google.android.gms.version"
+89-->[com.google.android.gms:play-services-basement:18.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/6c0b78089915c6f2e271d25383fba8f6/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+90            android:value="@integer/google_play_services_version" />
+90-->[com.google.android.gms:play-services-basement:18.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/6c0b78089915c6f2e271d25383fba8f6/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+91
+92        <receiver
+92-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+93            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+93-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+94            android:directBootAware="false"
+94-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+95            android:enabled="true"
+95-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+96            android:exported="true"
+96-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+97            android:permission="android.permission.DUMP" >
+97-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+98            <intent-filter>
+98-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+99                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+99-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+99-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+100            </intent-filter>
+101            <intent-filter>
+101-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+102                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+102-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+102-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+103            </intent-filter>
+104            <intent-filter>
+104-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+105                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+105-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+105-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+106            </intent-filter>
+107            <intent-filter>
+107-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+108                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+108-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+108-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/rylin/.gradle/caches/9.4.1/transforms/bfe6d2609f3bf50d8d041e0562761233/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+109            </intent-filter>
+110        </receiver>
+111    </application>
+112
+113</manifest>
