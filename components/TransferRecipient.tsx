@@ -62,7 +62,7 @@ export default function TransferRecipient({ initialTab = "Transfer" }: { initial
                 setTab(t);
                 // Keep screen state in sync for navigation consistency
                 if (t === "Transfer") setScreen("transfer-recipient");
-                else if (t === "Receive") setScreen("transfer-recipient");
+                else if (t === "Receive") setScreen("transfer-receive");
                 else if (t === "Money Packet") setScreen("money-packet");
                 else if (t === "Gift") setScreen("gift");
               }}
@@ -95,6 +95,7 @@ function TransferTabContent({
   setQ: (v: string) => void;
   balance: number;
 }) {
+  const { showBalance } = useApp();
   return (
     <>
       <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 bg-white">
@@ -160,7 +161,7 @@ function TransferTabContent({
       </div>
 
       <div className="bg-gray-50 py-3 text-center text-xs text-gray-600 border-t border-gray-200 flex items-center justify-center gap-1">
-        Transferable eWallet balance: {fmtRM(balance)} <Info className="w-3 h-3 text-tng-blue" />
+        Transferable eWallet balance: {showBalance ? fmtRM(balance) : "RM ••••••"} <Info className="w-3 h-3 text-tng-blue" />
       </div>
     </>
   );

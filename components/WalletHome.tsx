@@ -1,6 +1,6 @@
 "use client";
 import {
-  Search, User, Check, Eye, Plus, ChevronRight,
+  Search, User, Check, Eye, EyeOff, Plus, ChevronRight,
   FileCheck, PieChart, Send, CreditCard, Sparkles,
   Home, ShoppingBag, DollarSign, MapPin, ScanLine,
   Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned,
@@ -11,7 +11,7 @@ import { WALLET } from "@/lib/db";
 import { fmtRM } from "@/lib/utils";
 
 export default function WalletHome() {
-  const { balance, setShowTransferSheet, setShowTango, setScreen } = useApp();
+  const { balance, setShowTransferSheet, setShowTango, setScreen, showBalance, setShowBalance } = useApp();
   return (
     <div className="h-full w-full bg-[#f2f4f8] flex flex-col no-scrollbar overflow-y-auto">
       {/* Blue header */}
@@ -48,8 +48,10 @@ export default function WalletHome() {
           <div className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center">
             <Check className="w-3 h-3 text-white" strokeWidth={3} />
           </div>
-          <span className="text-2xl font-bold">{fmtRM(balance)}</span>
-          <Eye className="w-5 h-5 ml-1" />
+          <button onClick={() => setShowBalance(!showBalance)} className="flex items-center gap-2">
+            <span className="text-2xl font-bold">{showBalance ? fmtRM(balance) : "RM ••••••"}</span>
+            {showBalance ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+          </button>
         </div>
         <div className="text-xs text-white/80 mt-0.5 flex items-center gap-1">
           View asset details <ChevronRight className="w-3 h-3" />

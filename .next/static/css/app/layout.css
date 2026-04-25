@@ -893,9 +893,12 @@ video {
 .w-full {
   width: 100%;
 }
+<<<<<<< HEAD
 .w-\[85\%\] {
   width: 85%;
 }
+=======
+>>>>>>> a432a0c981aab082af7b6c7f6999167a72224594
 .min-w-0 {
   min-width: 0px;
 }

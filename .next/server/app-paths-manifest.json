@@ -1,5 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/api/remote/state/route": "app/api/remote/state/route.js",
-  "/api/analyze-whatsapp/route": "app/api/analyze-whatsapp/route.js"
+  "/page": "app/page.js"
 }
