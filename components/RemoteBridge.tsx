@@ -18,8 +18,8 @@ export default function RemoteBridge() {
   const {
     pairCode, setPairCode, setScreen, setShowTango, setShowTransferSheet,
     startTransfer, setHandoff, logAction, balance, actionLog,
+    showWatchPair, setShowWatchPair,
   } = useApp();
-  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [connected, setConnected] = useState(false);
   const [lastCmd, setLastCmd] = useState<string>("");
@@ -139,28 +139,13 @@ export default function RemoteBridge() {
 
   return (
     <>
-      {/* Floating watch-pair FAB (opposite side from Tango AI) */}
-      <button
-        onClick={() => setOpen(true)}
-        className="absolute left-4 bottom-24 w-12 h-12 rounded-full bg-white text-tng-blue shadow-xl border border-gray-200 flex items-center justify-center"
-        aria-label="Pair watch"
-        title="Pair with watch"
-      >
-        <Watch className="w-5 h-5" />
-        <span
-          className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-            connected ? "bg-emerald-500" : "bg-gray-300"
-          }`}
-        />
-      </button>
-
       <AnimatePresence>
-        {open && (
+        {showWatchPair && (
           <>
             <motion.div
               className="absolute inset-0 bg-black/40 z-[72]"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
+              onClick={() => setShowWatchPair(false)}
             />
             <motion.div
               className="absolute inset-x-3 bottom-3 z-[73] bg-white rounded-2xl shadow-2xl p-4"
@@ -176,7 +161,7 @@ export default function RemoteBridge() {
                     Open this URL on another device to control this app from your watch.
                   </div>
                 </div>
-                <button onClick={() => setOpen(false)} aria-label="Close"><X className="w-5 h-5 text-gray-500" /></button>
+                <button onClick={() => setShowWatchPair(false)} aria-label="Close"><X className="w-5 h-5 text-gray-500" /></button>
               </div>
 
               <div className="mt-3 grid grid-cols-[auto_1fr] gap-3 items-center">

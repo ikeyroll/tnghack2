@@ -3,7 +3,7 @@ import {
   Search, User, Check, Eye, EyeOff, Plus, ChevronRight,
   FileCheck, PieChart, Send, CreditCard, Sparkles,
   Home, ShoppingBag, DollarSign, MapPin, ScanLine,
-  Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned,
+  Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned, Watch,
   Coins, Building2, MessageSquare, Gift,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -11,7 +11,7 @@ import { WALLET } from "@/lib/db";
 import { fmtRM } from "@/lib/utils";
 
 export default function WalletHome() {
-  const { balance, setShowTransferSheet, setShowTango, setScreen, showBalance, setShowBalance } = useApp();
+  const { balance, setShowTransferSheet, setShowTango, setShowWatchPair, setScreen, showBalance, setShowBalance } = useApp();
   return (
     <div className="h-full w-full bg-[#f2f4f8] flex flex-col no-scrollbar overflow-y-auto">
       {/* Blue header */}
@@ -92,7 +92,7 @@ export default function WalletHome() {
       <div className="px-4 mt-4">
         <div className="text-sm font-semibold text-gray-900">Recommended</div>
         <div className="mt-2 grid grid-cols-4 gap-2">
-          <Shortcut icon={<Palmtree className="w-6 h-6 text-amber-500" />} label="Travel" />
+          <Shortcut icon={<Watch className="w-6 h-6 text-tng-blue" />} label="Pair Watch" onClick={() => setShowWatchPair(true)} />
           <Shortcut icon={<Coins className="w-6 h-6 text-yellow-500" />} label="e-Mas" />
           <Shortcut icon={<Wallet className="w-6 h-6 text-emerald-500" />} label="WalletSafe" />
           <Shortcut icon={<Fuel className="w-6 h-6 text-cyan-600" />} label="Petrol" />

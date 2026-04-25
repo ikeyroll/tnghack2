@@ -37,6 +37,7 @@ export type FlowState = {
   device: Device;
   showTransferSheet: boolean;
   showTango: boolean;
+  showWatchPair: boolean;
 
   recipient?: Recipient;
   amount?: number;
@@ -61,6 +62,7 @@ export type FlowState = {
   setDevice: (d: Device) => void;
   setShowTransferSheet: (v: boolean) => void;
   setShowTango: (v: boolean) => void;
+  setShowWatchPair: (v: boolean) => void;
   setRecipient: (r?: Recipient) => void;
   setAmount: (n?: number) => void;
   setNote: (n: string) => void;
@@ -88,6 +90,7 @@ export const useApp = create<FlowState>()(
   device: "phone",
   showTransferSheet: false,
   showTango: false,
+  showWatchPair: false,
 
   note: "Fund Transfer",
   balance: WALLET.balance,
@@ -98,6 +101,7 @@ export const useApp = create<FlowState>()(
   setDevice: (d) => set({ device: d }),
   setShowTransferSheet: (v) => set({ showTransferSheet: v }),
   setShowTango: (v) => set({ showTango: v }),
+  setShowWatchPair: (v) => set({ showWatchPair: v }),
   setRecipient: (r) => set({ recipient: r }),
   setAmount: (n) => set({ amount: n }),
   setNote: (n) => set({ note: n }),
