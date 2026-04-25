@@ -2,8 +2,11 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tango Wallet Assistant",
-  description: "AI-powered e-wallet demo with Tango assistant",
+  title: "Tango Guardian",
+  description: "Wearable AI financial defense system real-time fraud interception",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

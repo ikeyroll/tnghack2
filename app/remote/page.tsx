@@ -4,10 +4,20 @@ import { useSearchParams } from "next/navigation";
 import {
   Mic, Wifi, WifiOff, ArrowLeft, QrCode as QrIcon, Bell, Wallet, Sparkles,
   Home, ScanLine, CreditCard, Heart, DollarSign, Send,
+  ShieldAlert, CheckCircle2, Ban, Lock,
 } from "lucide-react";
 
 type Status = "idle" | "sending" | "ok" | "err";
-type View = "idle" | "listening" | "pay" | "balance" | "notifications" | "sent" | "error";
+type View = "idle" | "listening" | "pay" | "balance" | "notifications" | "sent" | "error" | "guardian";
+
+type GuardianApproval = {
+  id: string;
+  recipientName: string;
+  amount: number;
+  riskScore: number;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  reasons: string[];
+};
 
 type RoomState = {
   balance: number | null;
@@ -139,8 +149,10 @@ function Controller() {
   const [online, setOnline] = useState(true);
   const [now, setNow] = useState<string>("");
   const [state, setState] = useState<RoomState | null>(null);
+  const [approval, setApproval] = useState<GuardianApproval | null>(null);
 
   const recogRef = useRef<any>(null);
+  const esRef = useRef<EventSource | null>(null);
   const revertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clock
@@ -167,6 +179,57 @@ function Controller() {
       window.removeEventListener("offline", off);
     };
   }, []);
+
+  // SSE subscription for guardian-approval pushes from the phone
+  useEffect(() => {
+    if (!room || typeof window === "undefined") return;
+    const es = new EventSource(`/api/remote?room=${encodeURIComponent(room)}`);
+    esRef.current = es;
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.cmd === "guardian-approval" && data.payload) {
+          setApproval(data.payload as GuardianApproval);
+          setView("guardian");
+          // Haptic-like vibration on devices that support it
+          try {
+            (navigator as any).vibrate?.([80, 40, 80]);
+          } catch {}
+        }
+      } catch {}
+    };
+    return () => {
+      es.close();
+      esRef.current = null;
+    };
+  }, [room]);
+
+  const sendDecision = useCallback(
+    async (decision: "approve" | "block" | "freeze") => {
+      if (!room || !approval) return;
+      try {
+        await fetch("/api/remote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            room,
+            cmd: "guardian-decision",
+            payload: { id: approval.id, decision },
+          }),
+        });
+      } catch {}
+      setApproval(null);
+      setLastLabel(
+        decision === "approve"
+          ? "Transaction approved"
+          : decision === "block"
+          ? "Transaction blocked"
+          : "Wallet frozen"
+      );
+      setView("sent");
+    },
+    [room, approval]
+  );
 
   // Poll state (balance, notifications) every 3s when paired
   useEffect(() => {
@@ -317,6 +380,8 @@ function Controller() {
               <BalanceFace balance={state?.balance ?? null} onBack={() => setView("idle")} />
             ) : view === "notifications" ? (
               <NotificationsFace items={state?.notifications ?? []} onBack={() => setView("idle")} />
+            ) : view === "guardian" && approval ? (
+              <GuardianApprovalFace approval={approval} onDecide={sendDecision} />
             ) : view === "sent" ? (
               <SentFace label={lastLabel} />
             ) : (
@@ -482,6 +547,63 @@ function NotificationsFace({
             <div className="text-[10px] text-white truncate">{n.title}</div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function GuardianApprovalFace({
+  approval,
+  onDecide,
+}: {
+  approval: GuardianApproval;
+  onDecide: (d: "approve" | "block" | "freeze") => void;
+}) {
+  const palette =
+    approval.riskLevel === "critical"
+      ? "from-red-700 to-red-900"
+      : approval.riskLevel === "high"
+      ? "from-amber-700 to-red-800"
+      : "from-tng-blue to-indigo-700";
+  return (
+    <div className={`absolute inset-0 bg-gradient-to-br ${palette} flex flex-col items-center pt-9 pb-3 px-4 text-center`}>
+      <div className="flex items-center gap-1 text-[10px] font-semibold text-white/90">
+        <ShieldAlert className="w-3 h-3" /> SUSPICIOUS · RISK {approval.riskScore}
+      </div>
+      <div className="mt-1 text-[9px] text-white/70">
+        Tango Guardian
+      </div>
+      <div className="mt-1.5 text-xl font-bold text-white leading-none">
+        RM{approval.amount.toFixed(2)}
+      </div>
+      <div className="text-[10px] text-white/85 truncate max-w-full">
+        → {approval.recipientName}
+      </div>
+      <div className="mt-1.5 text-[9px] text-white/85 leading-snug px-1 line-clamp-2">
+        {approval.reasons.slice(0, 2).join(" · ")}
+      </div>
+      <div className="mt-auto grid grid-cols-3 gap-1.5 w-full">
+        <button
+          onClick={() => onDecide("approve")}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span className="text-[9px] font-bold">Approve</span>
+        </button>
+        <button
+          onClick={() => onDecide("block")}
+          className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
+        >
+          <Ban className="w-3.5 h-3.5" />
+          <span className="text-[9px] font-bold">Block</span>
+        </button>
+        <button
+          onClick={() => onDecide("freeze")}
+          className="bg-red-600 hover:bg-red-700 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
+        >
+          <Lock className="w-3.5 h-3.5" />
+          <span className="text-[9px] font-bold">Freeze</span>
+        </button>
       </div>
     </div>
   );

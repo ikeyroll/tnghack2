@@ -119,6 +119,16 @@ export default function RemoteBridge() {
       return;
     }
 
+    if (cmd === "guardian-decision") {
+      const decision = String(payload?.decision || "");
+      if (decision === "approve" || decision === "block" || decision === "freeze") {
+        window.dispatchEvent(
+          new CustomEvent("guardian-decision", { detail: { decision } })
+        );
+      }
+      return;
+    }
+
     if (cmd === "pay-merchant") {
       const amount = Number(payload?.amount) || 10;
       const name = String(payload?.name || MERCHANTS[0].name);

@@ -4,14 +4,119 @@
     <shared>
       <config />
     </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/mobile/src/main/res/layout/activity_main.xml">
+        <config>
+          <theme>@android:style/Theme.Material.Light</theme>
+        </config>
+      </layout>
+    </layouts>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f76b8507-31ef-467e-8047-caa5962105fc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../Windsurf/DocVersion2.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../app/api/risk-score/route.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../components/GuardianCenter.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../components/RiskApprovalSheet.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../lib/guardian.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../lib/intel.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../public/favicon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/AndroidProjectSystem.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/deviceManager.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DEMO_FLOW.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/gradle-daemon-jvm.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/proguard-rules.pro" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/androidTest/java/com/example/myapplication/ExampleInstrumentedTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/AndroidManifest.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/example/myapplication/MainActivity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/example/myapplication/WearMessageListenerService.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/drawable/ic_launcher_foreground.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/activity_main.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-anydpi/ic_launcher.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-anydpi/ic_launcher_round.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-hdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-hdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-mdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-mdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xxhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/values-night/themes.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/values/colors.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/values/strings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/values/themes.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/xml/backup_rules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/xml/data_extraction_rules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/test/java/com/example/myapplication/ExampleUnitTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/lint.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/proguard-rules.pro" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/AndroidManifest.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/example/myapplication/presentation/MainActivity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/example/myapplication/presentation/theme/Theme.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/data/Models.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/AlertsScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/BalanceScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/HandoffScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/HomeScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/ListeningScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/MainMenuScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/MerchantScreens.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/PayScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/TangoWatchApp.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/presentation/screens/WelcomeScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/service/PhoneHandoffService.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/java/com/tango/wallet/wear/service/RemoteService.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/drawable/ic_launcher_foreground.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/drawable/splash_icon.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/drawable/tango_logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-anydpi/ic_launcher.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-anydpi/ic_launcher_round.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/values/strings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/values/styles.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wear/src/main/res/xml/network_security_config.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../app/remote/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../app/remote/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../components/RemoteBridge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../components/RemoteBridge.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../components/TransferMoney.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../components/TransferMoney.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../components/WalletHome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../components/WalletHome.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +165,9 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3CppDEJnRfEUV2H8A3gxZXDdbxD" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="1" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

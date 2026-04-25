@@ -1,17 +1,39 @@
 "use client";
+import { useState } from "react";
 import {
   Search, User, Check, Eye, EyeOff, Plus, ChevronRight,
   FileCheck, PieChart, Send, CreditCard, Sparkles,
   Home, ShoppingBag, DollarSign, MapPin, ScanLine,
+<<<<<<< Updated upstream
   Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned, Watch,
   Coins, Building2, MessageSquare, Gift,
+=======
+  Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned,
+  Coins, Building2, MessageSquare, Gift, Shield, Lock,
+>>>>>>> Stashed changes
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { WALLET } from "@/lib/db";
 import { fmtRM } from "@/lib/utils";
+import { useGuardian } from "@/lib/guardian";
+import GuardianCenter from "./GuardianCenter";
 
 export default function WalletHome() {
+<<<<<<< Updated upstream
   const { balance, setShowTransferSheet, setShowTango, setShowWatchPair, setScreen, showBalance, setShowBalance } = useApp();
+=======
+  const { balance, setShowTransferSheet, setShowTango, setScreen } = useApp();
+  const { walletStatus, deviceTrust, stress } = useGuardian();
+  const [guardianOpen, setGuardianOpen] = useState(false);
+  const stressColor =
+    stress === "high" ? "bg-red-500" : stress === "elevated" ? "bg-amber-400" : "bg-emerald-400";
+  const trustColor =
+    deviceTrust.trustScore >= 80
+      ? "text-emerald-300"
+      : deviceTrust.trustScore >= 50
+      ? "text-amber-300"
+      : "text-red-300";
+>>>>>>> Stashed changes
   return (
     <div className="h-full w-full bg-[#f2f4f8] flex flex-col no-scrollbar overflow-y-auto">
       {/* Blue header */}
@@ -65,6 +87,34 @@ export default function WalletHome() {
             Transactions <ChevronRight className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Guardian status strip */}
+        <button
+          onClick={() => setGuardianOpen(true)}
+          className="mt-3 w-full flex items-center gap-2 bg-white/10 hover:bg-white/15 active:bg-white/20 rounded-xl px-3 py-2 text-left"
+        >
+          <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            {walletStatus === "frozen" ? (
+              <Lock className="w-4 h-4 text-red-200" />
+            ) : (
+              <Shield className="w-4 h-4 text-white" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] font-semibold leading-tight">
+              Tango Guardian {walletStatus === "frozen" ? "· Frozen" : "· Active"}
+            </div>
+            <div className="text-[10px] text-white/80 leading-tight">
+              <span className={trustColor}>Trust {deviceTrust.trustScore}</span>
+              {" · "}
+              <span className="inline-flex items-center gap-1">
+                <span className={`inline-block w-1.5 h-1.5 rounded-full ${stressColor}`} />
+                Stress {stress}
+              </span>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-white/70" />
+        </button>
       </div>
 
       {/* Quick actions */}
@@ -126,6 +176,22 @@ export default function WalletHome() {
         <Sparkles className="w-6 h-6" />
         <span className="absolute -top-1 -right-1 bg-yellow-400 text-[9px] text-black font-bold px-1.5 py-0.5 rounded-full">AI</span>
       </button>
+
+      {/* Guardian Center FAB */}
+      <button
+        onClick={() => setGuardianOpen(true)}
+        className="absolute right-4 bottom-44 w-12 h-12 rounded-full bg-white text-tng-blue border border-gray-200 shadow-xl flex items-center justify-center"
+        aria-label="Open Guardian Center"
+      >
+        <Shield className="w-5 h-5" />
+        <span
+          className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+            walletStatus === "frozen" ? "bg-red-500" : "bg-emerald-500"
+          }`}
+        />
+      </button>
+
+      <GuardianCenter open={guardianOpen} onClose={() => setGuardianOpen(false)} />
 
       {/* Bottom nav */}
       <div className="absolute bottom-0 inset-x-0 bg-white border-t border-gray-200 flex items-center justify-between px-6 py-2 pb-3">

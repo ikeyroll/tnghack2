@@ -18,7 +18,11 @@ import CashLoanScreen from "@/components/CashLoanScreen";
 import ScanScreen from "@/components/ScanScreen";
 import AddMoneyScreen from "@/components/AddMoneyScreen";
 import RemoteBridge from "@/components/RemoteBridge";
+<<<<<<< Updated upstream
 import SmartWatchScreen from "@/components/SmartWatchScreen";
+=======
+import RiskApprovalSheet from "@/components/RiskApprovalSheet";
+>>>>>>> Stashed changes
 import { useApp } from "@/lib/store";
 
 export default function Page() {
@@ -36,7 +40,7 @@ export default function Page() {
     <main className="min-h-[100dvh] w-full flex items-center justify-center p-4">
       <div className="flex flex-col items-center">
         <div className="hidden md:block text-white/80 text-xs mb-3 font-medium tracking-wide">
-          Tango Wallet Assistant · Hackathon Demo
+          Tango Guardian · Wearable AI Financial Defense
         </div>
         <PhoneShell>
           <AnimatePresence mode="wait">
@@ -78,6 +82,7 @@ export default function Page() {
           <AuthModal />
           <TangoAssistant />
           <RemoteBridge />
+          <RiskApprovalSheet />
 
           {/* Handoff banner from watch */}
           <AnimatePresence>
@@ -93,7 +98,7 @@ export default function Page() {
           </AnimatePresence>
         </PhoneShell>
         <div className="hidden md:block text-white/40 text-[11px] mt-3">
-          Demo only · no real payments · blue theme inspired by MY e-wallet UX
+          Real-time fraud interception · stress-aware control · mutual device trust
         </div>
       </div>
     </main>

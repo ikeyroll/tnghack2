@@ -90,5 +90,40 @@ lib/
   utils.ts
 ```
 
-### Wear OS note
-The watch simulator is a visual mock. A real Wear OS client would be built with Kotlin + Jetpack Compose for Wear, using the Wearable Data Layer to trigger deep links (`tango://transfer?...`) on the phone when secure authentication is required.
+## Wear OS App
+
+A real Wear OS implementation is now available in the `watch-app/` folder!
+
+### Quick Start (Wear OS)
+
+1. **Open watch-app in Android Studio**:
+   ```bash
+   cd watch-app
+   # Open this folder in Android Studio
+   ```
+
+2. **Create Wear OS emulator**:
+   - Tools → Device Manager → Create Device
+   - Select "Wear OS" tab → Choose "Pixel Watch"
+   - Download system image (API 33+)
+
+3. **Run the watch app**:
+   - Select **wear** module in run configuration
+   - Click Run ▶️
+
+4. **Demo the watch**:
+   - Tap "Pay merchant RM10" → Completes on watch
+   - Tap "Transfer RM500 to Rizwan" → Hands off to phone
+
+See [`watch-app/DEMO_FLOW.md`](./watch-app/DEMO_FLOW.md) for complete instructions.
+
+### Features
+- ✅ **Merchant payments**: Small transactions completed entirely on watch
+- 🔒 **Secure transfers**: Large transfers hand off to phone for authentication
+- 📱 **Deep link integration**: `tango://transfer?to={recipient}&amount={amount}`
+- 🎨 **Tango blue theme**: Matching the web app design
+
+### Tech Stack
+- Kotlin + Jetpack Compose for Wear Material 3
+- Wearable Data Layer for watch-phone communication
+- Deep links for seamless handoff

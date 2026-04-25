@@ -1,12 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ArrowLeft, User, ShieldCheck, Gift, Info } from "lucide-react";
+import { ArrowLeft, User, ShieldCheck, Gift, Info, Loader2, Lock } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { fmtRM } from "@/lib/utils";
+import { useGuardian } from "@/lib/guardian";
+import { scoreTransaction } from "@/lib/guardian";
 
 export default function TransferMoney() {
+<<<<<<< Updated upstream
   const { recipient, amount, setAmount, note, setNote, balance, confirmAmount, setScreen, showBalance } = useApp();
+=======
+  const { recipient, amount, setAmount, note, setNote, balance, confirmAmount, setScreen } = useApp();
+  const { walletStatus, setPendingApproval, pushAudit } = useGuardian();
+>>>>>>> Stashed changes
   const [local, setLocal] = useState(amount ? amount.toFixed(2) : "");
+  const [scoring, setScoring] = useState(false);
 
   useEffect(() => {
     setLocal(amount ? amount.toFixed(2) : "");
@@ -102,17 +110,71 @@ export default function TransferMoney() {
       </div>
 
       <div className="px-4 pb-4 bg-white border-t border-gray-100 pt-3">
+        {walletStatus === "frozen" && (
+          <div className="mb-2 text-[11px] text-red-700 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5" /> Wallet is frozen. Unfreeze in Guardian Center to continue.
+          </div>
+        )}
         <button
-          disabled={!valid || !recipient}
-          onClick={() => {
+          disabled={!valid || !recipient || scoring || walletStatus === "frozen"}
+          onClick={async () => {
+            if (!recipient) return;
             setAmount(num);
-            confirmAmount();
+            setScoring(true);
+            try {
+              const score = await scoreTransaction(recipient.id, num);
+              if (score.action === "block") {
+                pushAudit({
+                  kind: "blocked",
+                  summary: `Auto-blocked ${fmtRM(num)} → ${recipient.name}`,
+                  details: { riskScore: score.riskScore, reasons: score.reasons },
+                });
+                setPendingApproval({
+                  id: "p" + Date.now(),
+                  recipientId: recipient.id,
+                  recipientName: recipient.name,
+                  amount: num,
+                  riskScore: score.riskScore,
+                  riskLevel: score.riskLevel,
+                  reasons: score.reasons,
+                  createdAt: Date.now(),
+                });
+              } else if (
+                score.action === "require_watch_approval" ||
+                score.action === "require_confirmation"
+              ) {
+                pushAudit({
+                  kind: "approval-required",
+                  summary: `Approval required: ${fmtRM(num)} → ${recipient.name}`,
+                  details: { riskScore: score.riskScore, action: score.action },
+                });
+                setPendingApproval({
+                  id: "p" + Date.now(),
+                  recipientId: recipient.id,
+                  recipientName: recipient.name,
+                  amount: num,
+                  riskScore: score.riskScore,
+                  riskLevel: score.riskLevel,
+                  reasons: score.reasons,
+                  createdAt: Date.now(),
+                });
+              } else {
+                confirmAmount();
+              }
+            } catch {
+              confirmAmount();
+            } finally {
+              setScoring(false);
+            }
           }}
-          className={`w-full py-3 rounded-full font-semibold ${
-            valid && recipient ? "bg-tng-blue text-white shadow-md" : "bg-gray-200 text-gray-400"
+          className={`w-full py-3 rounded-full font-semibold flex items-center justify-center gap-2 ${
+            valid && recipient && walletStatus !== "frozen"
+              ? "bg-tng-blue text-white shadow-md"
+              : "bg-gray-200 text-gray-400"
           }`}
         >
-          Next
+          {scoring && <Loader2 className="w-4 h-4 animate-spin" />}
+          {scoring ? "Scoring risk…" : "Next"}
         </button>
       </div>
     </div>
