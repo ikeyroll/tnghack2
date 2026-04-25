@@ -18,12 +18,13 @@ export default function RemoteBridge() {
   const {
     pairCode, setPairCode, setScreen, setShowTango, setShowTransferSheet,
     startTransfer, setHandoff, logAction, balance, actionLog,
-    showWatchPair, setShowWatchPair, setAppFrozen,
+    showWatchPair, setShowWatchPair, setPhoneLocked, deductBalance,
   } = useApp();
   const [copied, setCopied] = useState(false);
   const [connected, setConnected] = useState(false);
   const [lastCmd, setLastCmd] = useState<string>("");
   const esRef = useRef<EventSource | null>(null);
+  const handleCommandRef = useRef<(cmd: string, payload: any) => void>(() => {});
 
   // Ensure a pair code exists
   useEffect(() => {
@@ -55,32 +56,10 @@ export default function RemoteBridge() {
     }).catch(() => {});
   }, [pairCode, balance, actionLog]);
 
-  // Subscribe to SSE
-  useEffect(() => {
-    if (!pairCode || typeof window === "undefined") return;
-    const es = new EventSource(`/api/remote?room=${encodeURIComponent(pairCode)}`);
-    esRef.current = es;
-    es.addEventListener("hello", () => setConnected(true));
-    es.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        handleCommand(data.cmd, data.payload);
-      } catch {}
-    };
-    es.onerror = () => setConnected(false);
-    return () => {
-      es.close();
-      esRef.current = null;
-      setConnected(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pairCode]);
-
+  // All command handling in one function
   function handleCommand(cmd: string, payload: any) {
     setLastCmd(cmd);
-    // Don't log internal echo commands (guardian-approval/decision are
-    // synced between devices and shouldn't appear as watch notifications).
-    const silent = cmd === "guardian-approval" || cmd === "guardian-decision" || cmd === "proximity-alert" || cmd === "proximity-clear" || cmd === "lock-phone";
+    const silent = cmd === "guardian-approval" || cmd === "guardian-decision" || cmd === "proximity-alert" || cmd === "proximity-clear" || cmd === "lock-phone" || cmd === "watch-transfer" || cmd === "watch-high-transfer";
     if (!silent) {
       setHandoff(`Watch command: ${cmd}`);
       logAction({
@@ -90,7 +69,6 @@ export default function RemoteBridge() {
       });
     }
 
-    // Navigation commands
     const nav: Record<string, Screen> = {
       "open-home": "home",
       "open-scan": "scan",
@@ -102,19 +80,10 @@ export default function RemoteBridge() {
       "open-watch": "watch",
       "open-transfer": "transfer-recipient",
     };
-    if (nav[cmd]) {
-      setScreen(nav[cmd]);
-      return;
-    }
+    if (nav[cmd]) { setScreen(nav[cmd]); return; }
 
-    if (cmd === "show-tango") {
-      setShowTango(true);
-      return;
-    }
-    if (cmd === "show-transfer-sheet") {
-      setShowTransferSheet(true);
-      return;
-    }
+    if (cmd === "show-tango") { setShowTango(true); return; }
+    if (cmd === "show-transfer-sheet") { setShowTransferSheet(true); return; }
 
     if (cmd === "pay-rizwan") {
       const amount = Number(payload?.amount) || 50;
@@ -126,16 +95,34 @@ export default function RemoteBridge() {
     if (cmd === "guardian-decision") {
       const decision = String(payload?.decision || "");
       if (decision === "approve" || decision === "block" || decision === "freeze") {
-        window.dispatchEvent(
-          new CustomEvent("guardian-decision", { detail: { decision } })
-        );
+        window.dispatchEvent(new CustomEvent("guardian-decision", { detail: { decision } }));
       }
       return;
     }
 
-    if (cmd === "lock-phone") {
-      setAppFrozen(true);
-      setScreen("home");
+    if (cmd === "lock-phone") { setPhoneLocked(true); return; }
+
+    if (cmd === "watch-transfer") {
+      const amt = Number(payload?.amount) || 10;
+      const name = String(payload?.name || "Unknown");
+      deductBalance(amt);
+      setHandoff(`Watch transferred ${fmtRM(amt)} to ${name}`);
+      logAction({
+        type: "watch-transfer",
+        summary: `Watch transferred ${fmtRM(amt)} to ${name}`,
+        details: { amount: amt, recipient: name, source: "remote-watch" },
+      });
+      return;
+    }
+
+    if (cmd === "watch-high-transfer") {
+      const amt = Number(payload?.amount) || 0;
+      const name = String(payload?.name || "Unknown");
+      setHandoff(`⚠️ High transfer RM${amt.toFixed(2)} to ${name} — please verify on phone`);
+      startTransfer(
+        RECIPIENTS.find((r) => r.name.toLowerCase().includes(name.toLowerCase())) || { id: "watch", name, phone: String(payload?.phone || ""), avatarColor: "#f59e0b" },
+        amt,
+      );
       return;
     }
 
@@ -151,6 +138,30 @@ export default function RemoteBridge() {
       return;
     }
   }
+
+  // Keep ref always pointing to latest handleCommand so SSE listener is never stale
+  handleCommandRef.current = handleCommand;
+
+  // Subscribe to SSE — uses ref to avoid stale closure
+  useEffect(() => {
+    if (!pairCode || typeof window === "undefined") return;
+    const es = new EventSource(`/api/remote?room=${encodeURIComponent(pairCode)}`);
+    esRef.current = es;
+    es.addEventListener("hello", () => setConnected(true));
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        handleCommandRef.current(data.cmd, data.payload);
+      } catch {}
+    };
+    es.onerror = () => setConnected(false);
+    return () => {
+      es.close();
+      esRef.current = null;
+      setConnected(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pairCode]);
 
   const remoteUrl =
     typeof window !== "undefined" && pairCode

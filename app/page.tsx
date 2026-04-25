@@ -23,7 +23,18 @@ import MerchantPay from "@/components/MerchantPay";
 import { useApp } from "@/lib/store";
 
 export default function Page() {
-  const { screen, handoffMessage, setHandoff } = useApp();
+  const { screen, handoffMessage, setHandoff, isPhoneLocked, setPhoneLocked, setScreen, pairCode } = useApp();
+
+  const clearWatchProximity = async () => {
+    const room = (pairCode || "DEMO").toUpperCase();
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ room, cmd: "proximity-clear", payload: {} }),
+      });
+    } catch {}
+  };
   // Collapse the Scan/Pay/Receive sibling screens into one key so switching
   // tabs inside ScanScreen doesn't trigger a slide animation.
   const animKey = screen === "pay" || screen === "receive" ? "scan" : screen === "money-packet" || screen === "gift" || screen === "transfer-receive" ? "transfer-recipient" : screen;
@@ -90,6 +101,43 @@ export default function Page() {
               >
                 <span className="truncate">📱 {handoffMessage}</span>
                 <button onClick={() => setHandoff(undefined)} className="opacity-80">✕</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Full-black lock screen triggered from watch */}
+          <AnimatePresence>
+            {isPhoneLocked && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 z-[100] bg-black flex flex-col items-center justify-center"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                  </div>
+                  <div className="text-white/30 text-sm font-medium tracking-wide">
+                    Phone Locked by Watch
+                  </div>
+                  <div className="text-white/15 text-xs text-center px-10 leading-relaxed">
+                    This device has been remotely locked via Tango Guardian.
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setPhoneLocked(false);
+                    clearWatchProximity();
+                    setScreen("auth");
+                  }}
+                  className="absolute bottom-12 inset-x-10 py-3 rounded-full border border-white/15 text-white/40 text-sm font-medium"
+                >
+                  Authenticate to Unlock
+                </button>
               </motion.div>
             )}
           </AnimatePresence>

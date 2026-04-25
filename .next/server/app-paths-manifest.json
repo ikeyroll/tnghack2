@@ -1,7 +1,8 @@
 {
-  "/page": "app/page.js",
   "/api/remote/state/route": "app/api/remote/state/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
   "/remote/page": "app/remote/page.js",
-  "/api/remote/route": "app/api/remote/route.js"
+  "/api/remote/route": "app/api/remote/route.js",
+  "/api/risk-score/route": "app/api/risk-score/route.js",
+  "/api/audit/route": "app/api/audit/route.js"
 }

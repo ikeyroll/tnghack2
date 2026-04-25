@@ -28,7 +28,7 @@ export type Screen =
 export type ActionLogEntry = {
   id: string;
   ts: number;
-  type: "transfer" | "scam-blocked" | "faq" | "whatsapp-upload" | "watch-merchant" | "watch-handoff";
+  type: "transfer" | "scam-blocked" | "faq" | "whatsapp-upload" | "watch-merchant" | "watch-handoff" | "watch-transfer";
   summary: string;
   details?: Record<string, any>;
 };
@@ -61,6 +61,7 @@ export type FlowState = {
 
   showBalance: boolean;
   isAppFrozen: boolean;
+  isPhoneLocked: boolean;
 
   // actions
   setScreen: (s: Screen) => void;
@@ -76,6 +77,7 @@ export type FlowState = {
   setPairCode: (code?: string) => void;
   setShowBalance: (v: boolean) => void;
   setAppFrozen: (v: boolean) => void;
+  setPhoneLocked: (v: boolean) => void;
   deductBalance: (amount: number) => void;
   addBalance: (amount: number) => void;
 
@@ -104,6 +106,7 @@ export const useApp = create<FlowState>()(
   actionLog: [],
   showBalance: true,
   isAppFrozen: false,
+  isPhoneLocked: false,
 
   setScreen: (s) => set({ screen: s }),
   setDevice: (d) => set({ device: d }),
@@ -118,6 +121,7 @@ export const useApp = create<FlowState>()(
   setPairCode: (code) => set({ pairCode: code }),
   setShowBalance: (v) => set({ showBalance: v }),
   setAppFrozen: (v) => set({ isAppFrozen: v }),
+  setPhoneLocked: (v) => set({ isPhoneLocked: v }),
   deductBalance: (amt) => set((s) => ({ balance: Math.max(0, +(s.balance - amt).toFixed(2)) })),
   addBalance: (amt) => set((s) => ({ balance: +(s.balance + amt).toFixed(2) })),
 

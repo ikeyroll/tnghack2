@@ -3,13 +3,13 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
-  Mic, Wifi, WifiOff, ArrowLeft, QrCode as QrIcon, Bell, Wallet, Sparkles,
+  Mic, Wifi, WifiOff, ArrowLeft, QrCode as QrIcon, Bell, Wallet, Send,
   ShieldAlert, CheckCircle2, Ban, Lock, ChevronLeft, ChevronRight, Heart,
-  Watch as WatchIcon, Smartphone, AlertTriangle,
+  Watch as WatchIcon, Smartphone, AlertTriangle, User, ArrowRight, Delete, Globe,
 } from "lucide-react";
 
 type Status = "idle" | "sending" | "ok" | "err";
-type View = "loading" | "menu" | "pay" | "balance" | "notifications" | "tango" | "listening" | "sent" | "error" | "guardian" | "stress" | "proximity";
+type View = "loading" | "menu" | "pay" | "balance" | "notifications" | "transfer" | "listening" | "sent" | "error" | "guardian" | "stress" | "proximity";
 
 type GuardianApproval = {
   id: string;
@@ -408,11 +408,15 @@ function Controller() {
       {/* Watch body with wristband */}
       <div className="relative flex flex-col items-center">
         {/* Top strap */}
-        <div className="w-[120px] h-[80px] bg-gradient-to-b from-zinc-800 via-zinc-850 to-zinc-900 rounded-t-2xl relative">
-          <div className="absolute inset-x-0 bottom-0 h-px bg-zinc-700/50" />
-          <div className="absolute left-1/2 -translate-x-1/2 top-3 w-16 h-[3px] rounded-full bg-zinc-700/60" />
-          <div className="absolute left-1/2 -translate-x-1/2 top-7 w-16 h-[3px] rounded-full bg-zinc-700/60" />
-          <div className="absolute left-1/2 -translate-x-1/2 top-11 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+        <div className="relative flex flex-col items-center">
+          <div className="w-[90px] h-[60px] bg-gradient-to-b from-zinc-700/80 to-zinc-800 rounded-t-[14px] relative overflow-hidden">
+            <div className="absolute inset-x-[6px] top-[10px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-x-[6px] top-[18px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-x-[6px] top-[26px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-y-0 left-[3px] w-[1px] bg-zinc-600/20" />
+            <div className="absolute inset-y-0 right-[3px] w-[1px] bg-zinc-600/20" />
+          </div>
+          <div className="w-[130px] h-[16px] bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-t-sm" />
         </div>
 
         <div className="relative">
@@ -442,7 +446,7 @@ function Controller() {
                 setIndex={setMenuIndex}
                 balance={state?.balance ?? null}
                 notifications={state?.notifications ?? []}
-                onTango={startMic}
+                onTransfer={() => setView("transfer")}
               />
             ) : view === "listening" ? (
               <ListeningFace heard={heard} onCancel={() => { stopMic(); setView("menu"); }} />
@@ -452,8 +456,8 @@ function Controller() {
               <BalanceFace balance={state?.balance ?? null} onBack={() => setView("menu")} />
             ) : view === "notifications" ? (
               <NotificationsFace items={state?.notifications ?? []} onBack={() => setView("menu")} />
-            ) : view === "tango" ? (
-              <TangoFace onBack={() => setView("menu")} onTap={startMic} heard={heard} />
+            ) : view === "transfer" ? (
+              <TransferFace room={room} onBack={() => setView("menu")} onDone={(label) => { setLastLabel(label); setView("sent"); }} />
             ) : view === "guardian" && approval ? (
               <GuardianApprovalFace approval={approval} onDecide={sendDecision} />
             ) : view === "stress" && stress ? (
@@ -504,11 +508,15 @@ function Controller() {
         </div>
 
         {/* Bottom strap */}
-        <div className="w-[120px] h-[80px] bg-gradient-to-t from-zinc-800 via-zinc-850 to-zinc-900 rounded-b-2xl relative">
-          <div className="absolute inset-x-0 top-0 h-px bg-zinc-700/50" />
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-3 w-16 h-[3px] rounded-full bg-zinc-700/60" />
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-7 w-16 h-[3px] rounded-full bg-zinc-700/60" />
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-11 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+        <div className="relative flex flex-col items-center">
+          <div className="w-[130px] h-[16px] bg-gradient-to-t from-zinc-800 to-zinc-900 rounded-b-sm" />
+          <div className="w-[90px] h-[60px] bg-gradient-to-t from-zinc-700/80 to-zinc-800 rounded-b-[14px] relative overflow-hidden">
+            <div className="absolute inset-x-[6px] bottom-[10px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-x-[6px] bottom-[18px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-x-[6px] bottom-[26px] h-[2px] rounded-full bg-zinc-600/40" />
+            <div className="absolute inset-y-0 left-[3px] w-[1px] bg-zinc-600/20" />
+            <div className="absolute inset-y-0 right-[3px] w-[1px] bg-zinc-600/20" />
+          </div>
         </div>
       </div>
 
@@ -549,21 +557,21 @@ function ConnectPopup() {
   );
 }
 
-type PageId = "balance" | "pay" | "notifications" | "tango";
-const pageOrder: PageId[] = ["balance", "pay", "notifications", "tango"];
+type PageId = "balance" | "pay" | "transfer" | "notifications";
+const pageOrder: PageId[] = ["balance", "pay", "transfer", "notifications"];
 
 function MenuFace({
   index,
   setIndex,
   balance,
   notifications,
-  onTango,
+  onTransfer,
 }: {
   index: number;
   setIndex: (i: number) => void;
   balance: number | null;
   notifications: { id: string; ts: number; title: string; body?: string }[];
-  onTango: () => void;
+  onTransfer: () => void;
 }) {
   const pageId = pageOrder[index];
   const prev = () => setIndex((index - 1 + pageOrder.length) % pageOrder.length);
@@ -576,7 +584,7 @@ function MenuFace({
         {pageId === "balance" && <BalancePage balance={balance} />}
         {pageId === "pay" && <PayPage />}
         {pageId === "notifications" && <NotificationsPage items={notifications} />}
-        {pageId === "tango" && <TangoPage onTap={onTango} />}
+        {pageId === "transfer" && <TransferPage onTap={onTransfer} />}
       </div>
 
       {/* Left arrow */}
@@ -671,40 +679,369 @@ function NotificationsPage({ items }: { items: { id: string; ts: number; title: 
   );
 }
 
-function TangoPage({ onTap }: { onTap: () => void }) {
+function TransferPage({ onTap }: { onTap: () => void }) {
   return (
     <button
       onClick={onTap}
       className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
     >
       <div className="flex items-center gap-1 text-[10px] text-white/70">
-        <Sparkles className="w-3 h-3 text-tng-blue" />
-        <span className="font-semibold">Tango AI</span>
+        <Send className="w-3 h-3 text-tng-blue" />
+        <span className="font-semibold">Transfer</span>
       </div>
-      <GeminiSpark size={48} />
-      <div className="text-white/90 text-xs font-medium">Ask Tango</div>
-      <div className="text-[9px] text-white/50">tap to speak</div>
+      <div className="w-12 h-12 rounded-full bg-tng-blue/20 flex items-center justify-center">
+        <Send className="w-6 h-6 text-tng-blue" />
+      </div>
+      <div className="text-white/90 text-xs font-medium">Send Money</div>
+      <div className="text-[9px] text-white/50">tap to start</div>
     </button>
   );
 }
 
-function TangoFace({ onBack, onTap, heard }: { onBack: () => void; onTap: () => void; heard: string }) {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-700 to-indigo-900">
-      <FaceHeader icon={<Sparkles className="w-3 h-3" />} title="Tango AI" onBack={onBack} />
-      <button
-        onClick={onTap}
-        className="flex flex-col items-center gap-3 active:scale-95 transition-transform"
-      >
-        <GeminiSpark size={56} />
-        <div className="text-white/90 text-sm font-medium">Ask Tango</div>
-        <div className="text-[9px] text-white/50">tap to speak</div>
-      </button>
-      {heard && (
-        <div className="absolute bottom-12 text-[10px] text-white/80 px-4 text-center truncate max-w-full">
-          "{heard}"
+const WATCH_CONTACTS = [
+  { id: "r1", name: "Rizwan", phone: "+6010-5543459", color: "#3b82f6" },
+  { id: "r4", name: "Faiz", phone: "+6013-4102233", color: "#f59e0b" },
+  { id: "r5", name: "Fazlin", phone: "+6011-6121904", color: "#ec4899" },
+];
+
+type TransferMethod = "ewallet" | "duitnow" | "overseas";
+
+function TransferFace({ room, onBack, onDone }: { room: string; onBack: () => void; onDone: (label: string) => void }) {
+  const [step, setStep] = useState<"method" | "contact" | "amount" | "pin" | "sending" | "success" | "high">("method");
+  const [method, setMethod] = useState<TransferMethod>("ewallet");
+  const [selected, setSelected] = useState<typeof WATCH_CONTACTS[0] | null>(null);
+  const [amount, setAmount] = useState("");
+  const [pin, setPin] = useState("");
+  const [phoneInput, setPhoneInput] = useState("");
+
+  const handleMethodSelect = (m: TransferMethod) => {
+    setMethod(m);
+    setStep("contact");
+  };
+
+  const handleContactSelect = (c: typeof WATCH_CONTACTS[0]) => {
+    setSelected(c);
+    setStep("amount");
+  };
+
+  const handleAmountConfirm = () => {
+    if (!amount || Number(amount) <= 0) return;
+    if (Number(amount) > 200) {
+      // High amount — redirect to phone
+      setStep("high");
+      fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: "watch-high-transfer",
+          payload: { amount: Number(amount), name: selected?.name, phone: selected?.phone },
+        }),
+      }).catch(() => {});
+      return;
+    }
+    setStep("pin");
+  };
+
+  const handlePinSubmit = async () => {
+    setStep("sending");
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: "watch-transfer",
+          payload: { amount: Number(amount), name: selected?.name, phone: selected?.phone },
+        }),
+      });
+    } catch {}
+    setTimeout(() => setStep("success"), 800);
+  };
+
+  const addAmountDigit = (d: string) => {
+    if (d === "." && amount.includes(".")) return;
+    if (amount.includes(".") && amount.split(".")[1].length >= 2) return;
+    setAmount((prev) => prev + d);
+  };
+
+  const addPinDigit = (d: string) => {
+    if (pin.length < 6) {
+      const newPin = pin + d;
+      setPin(newPin);
+      if (newPin.length === 6) {
+        setTimeout(() => handlePinSubmit(), 200);
+      }
+    }
+  };
+
+  const backspaceAmount = () => setAmount((prev) => prev.slice(0, -1));
+  const backspacePin = () => setPin((prev) => prev.slice(0, -1));
+
+  // Method selection step
+  if (step === "method") {
+    return (
+      <div className="absolute inset-0 flex flex-col bg-black">
+        <div className="absolute top-3 left-3 z-10">
+          <button onClick={onBack} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+            <ArrowLeft className="w-3.5 h-3.5 text-white" />
+          </button>
         </div>
-      )}
+        <div className="flex-1 flex flex-col items-center justify-center px-7">
+          <div className="flex items-center gap-1 mb-1">
+            <Send className="w-3 h-3 text-tng-blue" />
+            <span className="text-[11px] font-semibold text-white">Transfer</span>
+          </div>
+          <div className="text-[8px] text-white/40 mb-4">Select method</div>
+          <div className="w-full space-y-2">
+            <button
+              onClick={() => handleMethodSelect("ewallet")}
+              className="w-full flex items-center gap-3 bg-white/8 hover:bg-white/15 rounded-2xl px-3 py-3 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-tng-blue/20 flex items-center justify-center shrink-0">
+                <Wallet className="w-4.5 h-4.5 text-tng-blue" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="text-[11px] font-semibold text-white">eWallet</div>
+                <div className="text-[8px] text-white/40">Send via phone number</div>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-white/20 shrink-0" />
+            </button>
+            <button
+              onClick={() => handleMethodSelect("duitnow")}
+              className="w-full flex items-center gap-3 bg-white/8 hover:bg-white/15 rounded-2xl px-3 py-3 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                <Send className="w-4 h-4 text-emerald-400 rotate-45" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="text-[11px] font-semibold text-white">DuitNow</div>
+                <div className="text-[8px] text-white/40">Instant bank transfer</div>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-white/20 shrink-0" />
+            </button>
+            <button
+              onClick={() => handleMethodSelect("overseas")}
+              className="w-full flex items-center gap-3 bg-white/8 hover:bg-white/15 rounded-2xl px-3 py-3 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
+                <Globe className="w-4 h-4 text-purple-400" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="text-[11px] font-semibold text-white">Overseas</div>
+                <div className="text-[8px] text-white/40">International remittance</div>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-white/20 shrink-0" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Contact selection step
+  if (step === "contact") {
+    const methodLabel = method === "ewallet" ? "eWallet" : method === "duitnow" ? "DuitNow" : "Overseas";
+    return (
+      <div className="absolute inset-0 flex flex-col bg-black">
+        <div className="absolute top-3 left-3 z-10">
+          <button onClick={() => setStep("method")} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+            <ArrowLeft className="w-3.5 h-3.5 text-white" />
+          </button>
+        </div>
+        <div className="flex flex-col items-center pt-4 pb-1">
+          <div className="flex items-center gap-1">
+            <Send className="w-3 h-3 text-tng-blue" />
+            <span className="text-[11px] font-semibold text-white">{methodLabel}</span>
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col px-5 pt-1 overflow-y-auto no-scrollbar">
+          {method === "ewallet" && (
+            <div className="mb-2">
+              <div className="flex items-center gap-2 bg-white/8 rounded-xl px-3 py-2.5">
+                <User className="w-3.5 h-3.5 text-white/30 shrink-0" />
+                <input
+                  type="tel"
+                  value={phoneInput}
+                  onChange={(e) => setPhoneInput(e.target.value)}
+                  placeholder="Enter phone number"
+                  className="bg-transparent text-[11px] text-white placeholder-white/25 outline-none w-full"
+                />
+                {phoneInput && (
+                  <button
+                    onClick={() => {
+                      setSelected({ id: "custom", name: phoneInput, phone: phoneInput, color: "#6366f1" });
+                      setStep("amount");
+                    }}
+                    className="shrink-0 w-6 h-6 rounded-full bg-tng-blue flex items-center justify-center"
+                  >
+                    <ArrowRight className="w-3 h-3 text-white" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+          <div className="text-[8px] text-white/35 mb-1.5 uppercase tracking-wider font-medium">Recent</div>
+          <div className="space-y-1.5">
+            {WATCH_CONTACTS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => handleContactSelect(c)}
+                className="w-full flex items-center gap-2.5 bg-white/6 hover:bg-white/12 rounded-2xl px-3 py-2.5 transition-colors"
+              >
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[12px] font-bold shrink-0"
+                  style={{ backgroundColor: c.color }}
+                >
+                  {c.name[0]}
+                </div>
+                <div className="text-left min-w-0 flex-1">
+                  <div className="text-[11px] font-semibold text-white truncate">{c.name}</div>
+                  <div className="text-[9px] text-white/35">{c.phone}</div>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-white/15 shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Amount entry step
+  if (step === "amount") {
+    return (
+      <div className="absolute inset-0 flex flex-col bg-black">
+        <div className="absolute top-3 left-3 z-10">
+          <button onClick={() => setStep("contact")} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+            <ArrowLeft className="w-3.5 h-3.5 text-white" />
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center pt-8 px-6">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+              style={{ backgroundColor: selected?.color }}
+            >
+              {selected?.name[0]}
+            </div>
+            <span className="text-[11px] text-white/70 font-medium">{selected?.name}</span>
+          </div>
+          <div className="text-[22px] font-bold text-white mb-2 tracking-tight">
+            RM{amount || "0"}
+          </div>
+          <div className="grid grid-cols-3 gap-x-5 gap-y-1.5 mb-2">
+            {["1","2","3","4","5","6","7","8","9",".","0","⌫"].map((k) => (
+              <button
+                key={k}
+                onClick={() => k === "⌫" ? backspaceAmount() : addAmountDigit(k)}
+                className="w-9 h-7 flex items-center justify-center text-white text-[13px] font-medium active:scale-90 transition-transform rounded-lg active:bg-white/10"
+              >
+                {k === "⌫" ? <Delete className="w-4 h-4 text-white/50" /> : k}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleAmountConfirm}
+            disabled={!amount || Number(amount) <= 0}
+            className="w-full max-w-[160px] py-2 rounded-full bg-tng-blue text-white text-[11px] font-bold disabled:opacity-30"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // PIN entry step
+  if (step === "pin") {
+    return (
+      <div className="absolute inset-0 flex flex-col bg-black">
+        <div className="absolute top-2 left-2 z-10">
+          <button onClick={() => { setPin(""); setStep("amount"); }} className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+            <ArrowLeft className="w-3.5 h-3.5 text-white" />
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center pt-6 px-5">
+          <div className="text-[9px] text-white/50 mb-0.5">RM{Number(amount).toFixed(2)} → {selected?.name}</div>
+          <div className="text-[10px] text-white/70 font-medium mb-3">Enter PIN</div>
+          <div className="flex gap-2 mb-4">
+            {[0,1,2,3,4,5].map((i) => (
+              <div
+                key={i}
+                className={`w-5 h-5 rounded-full border-2 transition-all ${
+                  i < pin.length ? "bg-tng-blue border-tng-blue scale-110" : "border-white/25"
+                }`}
+              />
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-2">
+            {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k) => (
+              <button
+                key={k || "empty"}
+                onClick={() => k === "⌫" ? backspacePin() : k && addPinDigit(k)}
+                disabled={!k}
+                className="w-10 h-8 flex items-center justify-center text-white text-sm font-medium active:scale-90 transition-transform disabled:invisible"
+              >
+                {k === "⌫" ? <Delete className="w-4 h-4 text-white/60" /> : k}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sending step
+  if (step === "sending") {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
+        <div className="w-14 h-14 rounded-full bg-tng-blue/20 flex items-center justify-center mb-3">
+          <Send className="w-7 h-7 text-tng-blue animate-pulse" />
+        </div>
+        <div className="text-sm font-semibold text-white">Sending...</div>
+        <div className="text-[9px] text-white/50 mt-1">RM{Number(amount).toFixed(2)} → {selected?.name}</div>
+      </div>
+    );
+  }
+
+  // Success step
+  if (step === "success") {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
+        <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3">
+          <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+        </div>
+        <div className="text-sm font-bold text-white">Transfer Successful</div>
+        <div className="text-[10px] text-white/70 mt-1">RM{Number(amount).toFixed(2)} → {selected?.name}</div>
+        <div className="text-[8px] text-white/40 mt-0.5">Balance updated</div>
+        <button
+          onClick={() => onDone(`RM${Number(amount).toFixed(2)} → ${selected?.name}`)}
+          className="mt-4 px-6 py-2 rounded-full bg-white/10 text-white text-[10px] font-medium"
+        >
+          Done
+        </button>
+      </div>
+    );
+  }
+
+  // High amount warning step (>RM200)
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black px-6">
+      <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center mb-3">
+        <AlertTriangle className="w-7 h-7 text-amber-400" />
+      </div>
+      <div className="text-sm font-bold text-white text-center">High Amount</div>
+      <div className="text-[10px] text-white/60 mt-1 text-center leading-relaxed">
+        Transactions above RM200 require phone verification for your security.
+      </div>
+      <div className="text-[9px] text-white/40 mt-2">Opening on phone...</div>
+      <button
+        onClick={onBack}
+        className="mt-4 px-6 py-2 rounded-full bg-white/10 text-white text-[10px] font-medium"
+      >
+        Back to Menu
+      </button>
     </div>
   );
 }
@@ -796,35 +1133,35 @@ function GuardianApprovalFace({
   onDecide: (d: "approve" | "block" | "freeze") => void;
 }) {
   return (
-    <div className="absolute inset-0 bg-gradient-to-br from-tng-blue to-indigo-700 flex flex-col items-center pt-9 pb-3 px-4 text-center">
+    <div className="absolute inset-0 bg-gradient-to-br from-tng-blue to-indigo-700 flex flex-col items-center pt-8 pb-8 px-8 text-center">
       <div className="flex items-center gap-1 text-[10px] font-semibold text-white/90">
         <ShieldAlert className="w-3 h-3" /> UNUSUAL · RISK {approval.riskScore}
       </div>
-      <div className="mt-1 text-[9px] text-white/70">
+      <div className="mt-0.5 text-[8px] text-white/70">
         Tango Guardian
       </div>
-      <div className="mt-1.5 text-xl font-bold text-white leading-none">
+      <div className="mt-1 text-lg font-bold text-white leading-none">
         RM{approval.amount.toFixed(2)}
       </div>
-      <div className="text-[10px] text-white/85 truncate max-w-full">
+      <div className="text-[9px] text-white/85 truncate max-w-full">
         → {approval.recipientName}
       </div>
-      <div className="mt-1.5 text-[9px] text-white/85 leading-snug px-1 line-clamp-2">
+      <div className="mt-1 text-[8px] text-white/80 leading-snug px-1 line-clamp-2">
         {approval.reasons.slice(0, 2).join(" · ")}
       </div>
-      <div className="mt-auto grid grid-cols-2 gap-1.5 w-full">
+      <div className="mt-auto grid grid-cols-2 gap-2 w-full">
         <button
           onClick={() => onDecide("block")}
-          className="bg-white/15 hover:bg-white/25 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5 border border-white/20"
+          className="bg-white/15 hover:bg-white/25 text-white rounded-xl py-2 flex flex-col items-center gap-0.5 border border-white/20"
         >
-          <Ban className="w-3.5 h-3.5" />
+          <Ban className="w-4 h-4" />
           <span className="text-[10px] font-bold">Reject</span>
         </button>
         <button
           onClick={() => onDecide("approve")}
-          className="bg-white text-tng-blue rounded-lg py-1.5 flex flex-col items-center gap-0.5 shadow-md"
+          className="bg-white text-tng-blue rounded-xl py-2 flex flex-col items-center gap-0.5 shadow-md"
         >
-          <CheckCircle2 className="w-3.5 h-3.5" />
+          <CheckCircle2 className="w-4 h-4" />
           <span className="text-[10px] font-bold">Approve</span>
         </button>
       </div>
