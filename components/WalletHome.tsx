@@ -31,10 +31,13 @@ export default function WalletHome() {
     setAmount,
     setNote,
     completeProcessing,
+    isAppFrozen,
+    setAppFrozen,
   } = useApp();
   const { setPendingApproval, pushAudit } = useGuardian();
   const [showUnauthorizedDemo, setShowUnauthorizedDemo] = useState(false);
   const [showRejectedModal, setShowRejectedModal] = useState(false);
+  const [showProximityWarning, setShowProximityWarning] = useState(false);
 
   const sendWatchDecision = async (decision: "approve" | "block") => {
     const room = (pairCode || "DEMO").toUpperCase();
@@ -46,6 +49,23 @@ export default function WalletHome() {
           room,
           cmd: "guardian-decision",
           payload: { decision },
+        }),
+      });
+    } catch {}
+  };
+
+  const sendWatchProximity = async (alert: boolean, message?: string) => {
+    const room = (pairCode || "DEMO").toUpperCase();
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: alert ? "proximity-alert" : "proximity-clear",
+          payload: alert
+            ? { message: message || "Phone out of range. Possible theft." }
+            : {},
         }),
       });
     } catch {}
@@ -280,6 +300,89 @@ export default function WalletHome() {
         </div>
       )}
 
+      {/* Proximity Warning Modal */}
+      {showProximityWarning && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="bg-gradient-to-r from-tng-blue to-blue-600 px-5 py-3.5 flex items-center gap-2.5">
+              <Watch className="w-5 h-5 text-white" />
+              <span className="text-white font-bold text-base">Watch Not Nearby</span>
+            </div>
+            <div className="p-6 flex flex-col items-center text-center">
+              <div className="w-20 h-20 rounded-full bg-orange-50 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-10 h-10 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Phone and Watch Too Far Apart
+              </h3>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                Your Tango Guardian smartwatch is out of range. This could indicate theft or unauthorized access. Please authenticate to continue using this app.
+              </p>
+              <div className="w-full bg-blue-50 rounded-2xl p-4 mb-5">
+                <div className="text-sm text-tng-blue font-bold mb-1">Security Notice</div>
+                <div className="text-sm text-gray-700 leading-relaxed">
+                  Keep your watch nearby for enhanced security and fraud protection.
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowProximityWarning(false);
+                  setAppFrozen(false);
+                  sendWatchProximity(false);
+                  setScreen("auth");
+                }}
+                className="w-full py-3.5 rounded-full bg-tng-blue text-white font-bold text-base shadow-lg"
+              >
+                Authenticate
+              </button>
+              <button
+                onClick={() => {
+                  setShowProximityWarning(false);
+                  setAppFrozen(true);
+                  // keep watch alert visible while frozen
+                }}
+                className="w-full mt-3 py-3 text-base text-gray-500 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* App Frozen Overlay */}
+      {isAppFrozen && (
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="bg-gradient-to-r from-tng-blue to-blue-600 px-5 py-3.5 flex items-center gap-2.5">
+              <ShieldX className="w-5 h-5 text-white" />
+              <span className="text-white font-bold text-base">App Locked</span>
+            </div>
+            <div className="p-6 flex flex-col items-center text-center">
+              <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <ShieldX className="w-10 h-10 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Authentication Required
+              </h3>
+              <p className="text-sm text-gray-600 mb-5 leading-relaxed">
+                The app has been locked for your security. Please authenticate with your Tango Guardian watch to continue.
+              </p>
+              <button
+                onClick={() => {
+                  setAppFrozen(false);
+                  sendWatchProximity(false);
+                  setScreen("auth");
+                }}
+                className="w-full py-3.5 rounded-full bg-tng-blue text-white font-bold text-base shadow-lg"
+              >
+                Authenticate Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Quick actions */}
       <div className="px-4 -mt-3">
         <div className="bg-white rounded-2xl shadow-sm grid grid-cols-4 gap-1 py-3 px-2">
@@ -290,7 +393,14 @@ export default function WalletHome() {
             label="Transfer"
             onClick={() => setShowTransferSheet(true)}
           />
-          <QuickAction icon={<CreditCard className="w-5 h-5 text-tng-blue" />} label="Cards" />
+          <QuickAction 
+            icon={<CreditCard className="w-5 h-5 text-tng-blue" />} 
+            label="Cards" 
+            onClick={() => {
+              setShowProximityWarning(true);
+              sendWatchProximity(true);
+            }}
+          />
         </div>
       </div>
 

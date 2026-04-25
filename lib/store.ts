@@ -60,6 +60,7 @@ export type FlowState = {
   pairCode?: string;
 
   showBalance: boolean;
+  isAppFrozen: boolean;
 
   // actions
   setScreen: (s: Screen) => void;
@@ -74,6 +75,7 @@ export type FlowState = {
   setHandoff: (msg?: string) => void;
   setPairCode: (code?: string) => void;
   setShowBalance: (v: boolean) => void;
+  setAppFrozen: (v: boolean) => void;
   deductBalance: (amount: number) => void;
   addBalance: (amount: number) => void;
 
@@ -101,6 +103,7 @@ export const useApp = create<FlowState>()(
   balance: WALLET.balance,
   actionLog: [],
   showBalance: true,
+  isAppFrozen: false,
 
   setScreen: (s) => set({ screen: s }),
   setDevice: (d) => set({ device: d }),
@@ -114,16 +117,26 @@ export const useApp = create<FlowState>()(
   setHandoff: (msg) => set({ handoffMessage: msg }),
   setPairCode: (code) => set({ pairCode: code }),
   setShowBalance: (v) => set({ showBalance: v }),
+  setAppFrozen: (v) => set({ isAppFrozen: v }),
   deductBalance: (amt) => set((s) => ({ balance: Math.max(0, +(s.balance - amt).toFixed(2)) })),
   addBalance: (amt) => set((s) => ({ balance: +(s.balance + amt).toFixed(2) })),
 
-  logAction: (entry) =>
+  logAction: (entry) => {
     set((state) => ({
       actionLog: [
         { id: "a" + Date.now() + Math.random().toString(36).slice(2, 6), ts: Date.now(), ...entry },
         ...state.actionLog,
       ].slice(0, 50),
-    })),
+    }));
+    // Fire-and-forget persist to Supabase.
+    if (typeof window !== "undefined") {
+      fetch("/api/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "action", entry }),
+      }).catch(() => {});
+    }
+  },
   clearActionLog: () => set({ actionLog: [] }),
 
   startTransfer: (r, amount, note) =>

@@ -134,7 +134,7 @@ export const useGuardian = create<GuardianState>()(
         get().pushAudit({ kind: "unfrozen", summary: "Wallet unfrozen" });
       },
 
-      pushAudit: (e) =>
+      pushAudit: (e) => {
         set((state) => ({
           audit: [
             {
@@ -144,7 +144,15 @@ export const useGuardian = create<GuardianState>()(
             },
             ...state.audit,
           ].slice(0, 80),
-        })),
+        }));
+        if (typeof window !== "undefined") {
+          fetch("/api/audit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ kind: "guardian", entry: e }),
+          }).catch(() => {});
+        }
+      },
 
       clearAudit: () => set({ audit: [] }),
     }),

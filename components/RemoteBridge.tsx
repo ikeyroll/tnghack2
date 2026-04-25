@@ -18,7 +18,7 @@ export default function RemoteBridge() {
   const {
     pairCode, setPairCode, setScreen, setShowTango, setShowTransferSheet,
     startTransfer, setHandoff, logAction, balance, actionLog,
-    showWatchPair, setShowWatchPair,
+    showWatchPair, setShowWatchPair, setAppFrozen,
   } = useApp();
   const [copied, setCopied] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -80,7 +80,7 @@ export default function RemoteBridge() {
     setLastCmd(cmd);
     // Don't log internal echo commands (guardian-approval/decision are
     // synced between devices and shouldn't appear as watch notifications).
-    const silent = cmd === "guardian-approval" || cmd === "guardian-decision";
+    const silent = cmd === "guardian-approval" || cmd === "guardian-decision" || cmd === "proximity-alert" || cmd === "proximity-clear" || cmd === "lock-phone";
     if (!silent) {
       setHandoff(`Watch command: ${cmd}`);
       logAction({
@@ -130,6 +130,12 @@ export default function RemoteBridge() {
           new CustomEvent("guardian-decision", { detail: { decision } })
         );
       }
+      return;
+    }
+
+    if (cmd === "lock-phone") {
+      setAppFrozen(true);
+      setScreen("home");
       return;
     }
 

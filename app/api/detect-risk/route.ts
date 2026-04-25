@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RECIPIENTS, averageSentTo } from "@/lib/db";
+import { listRecipients, averageSentToDb } from "@/lib/data";
 import { genJson } from "@/lib/gemini";
 
 export const runtime = "nodejs";
@@ -11,8 +12,14 @@ type RiskResp = {
   multiplier: number;
 };
 
-function heuristic(recipientId: string, amount: number): RiskResp {
-  const avg = averageSentTo(recipientId);
+async function heuristic(recipientId: string, amount: number): Promise<RiskResp> {
+  // Try Supabase first; fall back to in-memory db if it fails.
+  let avg = 0;
+  try {
+    avg = await averageSentToDb(recipientId);
+  } catch {
+    avg = averageSentTo(recipientId);
+  }
   const reasons: string[] = [];
   let risk: RiskResp["risk"] = "low";
   const mult = avg > 0 ? amount / avg : 1;
@@ -31,11 +38,12 @@ function heuristic(recipientId: string, amount: number): RiskResp {
 
 export async function POST(req: NextRequest) {
   const { recipientId, amount } = await req.json().catch(() => ({}));
-  const r = RECIPIENTS.find((r) => r.id === recipientId);
+  const all = await listRecipients().catch(() => RECIPIENTS);
+  const r = (all.length ? all : RECIPIENTS).find((r) => r.id === recipientId);
   if (!r || typeof amount !== "number") {
     return NextResponse.json({ risk: "low", reasons: [], avg: 0, multiplier: 1 });
   }
-  const base = heuristic(recipientId, amount);
+  const base = await heuristic(recipientId, amount);
   const prompt = `Recipient: ${r.name}. Historical avg sent: RM${base.avg.toFixed(2)}. Current amount: RM${amount}.
 Classify risk (low/medium/high) and list short reasons. Return JSON { "risk": "...", "reasons": [...] }.`;
   const ai = await genJson<{ risk: RiskResp["risk"]; reasons: string[] }>(prompt);

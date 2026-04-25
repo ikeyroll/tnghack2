@@ -5,10 +5,11 @@ import Image from "next/image";
 import {
   Mic, Wifi, WifiOff, ArrowLeft, QrCode as QrIcon, Bell, Wallet, Sparkles,
   ShieldAlert, CheckCircle2, Ban, Lock, ChevronLeft, ChevronRight, Heart,
+  Watch as WatchIcon, Smartphone, AlertTriangle,
 } from "lucide-react";
 
 type Status = "idle" | "sending" | "ok" | "err";
-type View = "loading" | "menu" | "pay" | "balance" | "notifications" | "tango" | "listening" | "sent" | "error" | "guardian" | "stress";
+type View = "loading" | "menu" | "pay" | "balance" | "notifications" | "tango" | "listening" | "sent" | "error" | "guardian" | "stress" | "proximity";
 
 type GuardianApproval = {
   id: string;
@@ -152,6 +153,7 @@ function Controller() {
   const [state, setState] = useState<RoomState | null>(null);
   const [approval, setApproval] = useState<GuardianApproval | null>(null);
   const [stress, setStress] = useState<{ bpm: number; reason?: string } | null>(null);
+  const [proximity, setProximity] = useState<{ message?: string } | null>(null);
 
   const recogRef = useRef<any>(null);
   const esRef = useRef<EventSource | null>(null);
@@ -225,6 +227,13 @@ function Controller() {
         } else if (data.cmd === "stress-clear") {
           setStress(null);
           setView((cur) => (cur === "stress" ? "balance" : cur));
+        } else if (data.cmd === "proximity-alert") {
+          setProximity({ message: data.payload?.message });
+          setView("proximity");
+          try { (navigator as any).vibrate?.([100, 60, 100, 60, 100]); } catch {}
+        } else if (data.cmd === "proximity-clear") {
+          setProximity(null);
+          setView((cur) => (cur === "proximity" ? "balance" : cur));
         }
       } catch {}
     };
@@ -440,6 +449,16 @@ function Controller() {
               <GuardianApprovalFace approval={approval} onDecide={sendDecision} />
             ) : view === "stress" && stress ? (
               <StressFace bpm={stress.bpm} reason={stress.reason} />
+            ) : view === "proximity" ? (
+              <ProximityFace message={proximity?.message} onLockPhone={async () => {
+                try {
+                  await fetch("/api/remote", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ room, cmd: "lock-phone", payload: {} }),
+                  });
+                } catch {}
+              }} />
             ) : view === "sent" ? (
               <SentFace label={lastLabel} />
             ) : (
@@ -846,6 +865,74 @@ function StressFace({ bpm, reason }: { bpm: number; reason?: string }) {
         @keyframes stressPulse {
           0% { transform: scale(0.7); opacity: 0.55; }
           100% { transform: scale(1.6); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ProximityFace({ message, onLockPhone }: { message?: string; onLockPhone?: () => void }) {
+  return (
+    <div className="absolute inset-0 bg-gradient-to-br from-tng-blue via-blue-700 to-indigo-800 flex flex-col items-center pt-8 pb-3 px-4 text-center overflow-hidden">
+      {/* Pulsing rings */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className="w-44 h-44 rounded-full bg-white/10"
+          style={{ animation: "proxPulse 1.4s ease-out infinite" }}
+        />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className="w-32 h-32 rounded-full bg-white/15"
+          style={{ animation: "proxPulse 1.4s ease-out 0.5s infinite" }}
+        />
+      </div>
+
+      <div className="flex items-center gap-1 text-[10px] font-semibold text-white/95 z-10">
+        <AlertTriangle className="w-3 h-3" /> SECURITY ALERT
+      </div>
+      <div className="mt-0.5 text-[9px] text-white/70 z-10">Tango Guardian</div>
+
+      <div className="mt-auto mb-auto z-10 flex flex-col items-center">
+        <div className="relative flex items-center justify-center gap-1">
+          <Smartphone
+            className="w-8 h-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+            style={{ animation: "proxDrift 1.6s ease-in-out infinite" }}
+          />
+          <div className="flex flex-col gap-0.5 mx-0.5">
+            <div className="w-1 h-1 rounded-full bg-white/80" />
+            <div className="w-1 h-1 rounded-full bg-white/50" />
+            <div className="w-1 h-1 rounded-full bg-white/30" />
+          </div>
+          <WatchIcon
+            className="w-8 h-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+          />
+        </div>
+        <div className="mt-1.5 text-xs font-bold text-white leading-tight">
+          Phone Out of Range
+        </div>
+      </div>
+
+      <div className="z-10 text-[8px] text-white/90 leading-snug px-2 line-clamp-2 mb-1.5">
+        {message || "Possible theft detected."}
+      </div>
+
+      <button
+        onClick={onLockPhone}
+        className="z-10 w-full bg-white text-tng-blue rounded-lg py-1.5 flex items-center justify-center gap-1 shadow-md mb-0.5"
+      >
+        <Lock className="w-3.5 h-3.5" />
+        <span className="text-[10px] font-bold">Lock Phone</span>
+      </button>
+
+      <style jsx>{`
+        @keyframes proxPulse {
+          0% { transform: scale(0.7); opacity: 0.55; }
+          100% { transform: scale(1.7); opacity: 0; }
+        }
+        @keyframes proxDrift {
+          0%, 100% { transform: translateX(-2px); }
+          50% { transform: translateX(-10px); }
         }
       `}</style>
     </div>

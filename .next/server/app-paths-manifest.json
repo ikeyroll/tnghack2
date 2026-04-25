@@ -1,12 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/remote/page": "app/remote/page.js",
-  "/api/detect-risk/route": "app/api/detect-risk/route.js",
-  "/api/analyze-image/route": "app/api/analyze-image/route.js",
-  "/api/analyze-whatsapp/route": "app/api/analyze-whatsapp/route.js",
   "/api/remote/state/route": "app/api/remote/state/route.js",
+  "/remote/page": "app/remote/page.js",
   "/api/remote/route": "app/api/remote/route.js",
-  "/api/tango/route": "app/api/tango/route.js",
-  "/api/risk-score/route": "app/api/risk-score/route.js"
+  "/page": "app/page.js"
 }
