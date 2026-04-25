@@ -14,9 +14,9 @@ export type Screen =
   | "receive"
   | "prepaid"
   | "donation"
-  | "cashloan"
   | "scan"
   | "pay"
+  | "pay-donation"
   | "money-packet"
   | "gift"
   | "transfer-receive";
@@ -71,6 +71,7 @@ export type FlowState = {
   clearActionLog: () => void;
 
   startTransfer: (r: Recipient, amount?: number, note?: string) => void;
+  startDonation: (r: Recipient) => void;
   confirmAmount: () => void;
   authenticate: () => Promise<void>;
   completeProcessing: () => void;
@@ -116,6 +117,17 @@ export const useApp = create<FlowState>()(
       amount,
       note: note ?? "Fund Transfer",
       screen: "transfer-money",
+      showTransferSheet: false,
+      showTango: false,
+      device: "phone",
+    }),
+
+  startDonation: (r) =>
+    set({
+      recipient: r,
+      amount: undefined,
+      note: "",
+      screen: "pay-donation",
       showTransferSheet: false,
       showTango: false,
       device: "phone",
