@@ -1,5 +1,6 @@
 {
   "/page": "app/page.js",
-  "/api/remote/route": "app/api/remote/route.js",
-  "/api/remote/state/route": "app/api/remote/state/route.js"
+  "/api/remote/state/route": "app/api/remote/state/route.js",
+  "/remote/page": "app/remote/page.js",
+  "/api/remote/route": "app/api/remote/route.js"
 }

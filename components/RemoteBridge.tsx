@@ -78,13 +78,17 @@ export default function RemoteBridge() {
 
   function handleCommand(cmd: string, payload: any) {
     setLastCmd(cmd);
-    // Brief handoff banner so the user sees something happen
-    setHandoff(`Watch command: ${cmd}`);
-    logAction({
-      type: "watch-handoff",
-      summary: `Remote watch → ${cmd}`,
-      details: { cmd, payload, source: "remote-watch" },
-    });
+    // Don't log internal echo commands (guardian-approval/decision are
+    // synced between devices and shouldn't appear as watch notifications).
+    const silent = cmd === "guardian-approval" || cmd === "guardian-decision";
+    if (!silent) {
+      setHandoff(`Watch command: ${cmd}`);
+      logAction({
+        type: "watch-handoff",
+        summary: `Remote watch → ${cmd}`,
+        details: { cmd, payload, source: "remote-watch" },
+      });
+    }
 
     // Navigation commands
     const nav: Record<string, Screen> = {

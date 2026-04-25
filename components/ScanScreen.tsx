@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Image as ImageIcon, Trash2, Download, CameraOff } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, Trash2, Download, CameraOff, Heart, Wind, X } from "lucide-react";
 import { useApp } from "@/lib/store";
+import { useGuardian } from "@/lib/guardian";
 import { fmtRM } from "@/lib/utils";
 
 type Tab = "Scan" | "Pay" | "Receive";
@@ -102,6 +103,44 @@ export default function ScanScreen({ initialTab = "Scan" }: { initialTab?: ScanI
 function ScanTab() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [camState, setCamState] = useState<"loading" | "on" | "denied" | "unsupported">("loading");
+  const { pairCode, setMerchantName, setScreen } = useApp();
+  const { pushAudit } = useGuardian();
+  const [showStress, setShowStress] = useState(false);
+  const [bpm] = useState(() => 118 + Math.floor(Math.random() * 18)); // 118–135
+
+  const room = (pairCode || "DEMO").toUpperCase();
+
+  const sendWatchStress = async (alert: boolean) => {
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: alert ? "stress-alert" : "stress-clear",
+          payload: alert
+            ? { bpm, reason: "Heart rate spiked while paying" }
+            : null,
+        }),
+      });
+    } catch {}
+  };
+
+  const triggerStressDemo = async () => {
+    setShowStress(true);
+    pushAudit({
+      kind: "approval-required",
+      summary: `Stress detected — heart rate ${bpm} bpm`,
+      details: { bpm, source: "watch-biosignal" },
+    });
+    await sendWatchStress(true);
+  };
+
+  const dismissStress = async () => {
+    setShowStress(false);
+    pushAudit({ kind: "approved", summary: `User acknowledged stress alert (${bpm} bpm)` });
+    await sendWatchStress(false);
+  };
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -177,7 +216,11 @@ function ScanTab() {
         <button className="px-4 py-2.5 rounded-full bg-tng-blue text-white text-sm font-semibold flex items-center gap-2">
           <ImageIcon className="w-4 h-4" /> Scan From Gallery
         </button>
-        <button className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center" aria-label="Clear">
+        <button
+          onClick={triggerStressDemo}
+          className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center active:bg-gray-300"
+          aria-label="Clear"
+        >
           <Trash2 className="w-4 h-4 text-gray-600" />
         </button>
       </div>
@@ -186,6 +229,71 @@ function ScanTab() {
         You can now scan and pay in China, Thailand, Indonesia, and more.
         <div className="text-tng-blue font-semibold mt-1">View all countries</div>
       </div>
+
+      {/* Stress / heart-rate alert modal (TnG blue) */}
+      {showStress && (
+        <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="bg-gradient-to-r from-tng-blue to-indigo-600 px-4 py-3 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-white fill-white" />
+              <span className="text-white font-bold">Take a moment</span>
+              <button
+                onClick={dismissStress}
+                className="ml-auto p-1 -mr-1 rounded-full hover:bg-white/15 active:bg-white/25"
+                aria-label="Dismiss"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <div className="p-5 flex flex-col items-center text-center">
+              <div className="relative flex items-center justify-center mb-3">
+                <span className="absolute w-20 h-20 rounded-full bg-tng-blue/15 animate-ping" />
+                <div className="w-16 h-16 rounded-full bg-tng-sky flex items-center justify-center relative">
+                  <Heart className="w-9 h-9 text-tng-blue fill-tng-blue animate-pulse" />
+                </div>
+              </div>
+
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold text-tng-blue tabular-nums leading-none">
+                  {bpm}
+                </span>
+                <span className="text-xs font-semibold text-tng-blue/80">BPM</span>
+              </div>
+              <div className="text-[11px] font-semibold text-tng-blue/70 mt-0.5">
+                ELEVATED HEART RATE
+              </div>
+
+              <div className="mt-4 text-sm font-semibold text-gray-900">
+                Tango sensed you may be stressed
+              </div>
+              <div className="mt-1 text-xs text-gray-600 leading-relaxed">
+                Your watch detected an elevated heart rate while you opened the scanner.
+                Stress and rushed payments are common signs of scam pressure or impulse
+                buys. Take a deep breath before scanning.
+              </div>
+
+              <div className="mt-3 w-full bg-tng-sky/40 border border-tng-sky rounded-xl px-3 py-2 flex items-center gap-2 text-left">
+                <Wind className="w-4 h-4 text-tng-blue shrink-0" />
+                <div className="text-[11px] text-tng-blue leading-snug">
+                  <span className="font-semibold">Try box breathing:</span> in 4s, hold 4s,
+                  out 4s, hold 4s.
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  dismissStress();
+                  setMerchantName("Gussi");
+                  setScreen("pay-merchant");
+                }}
+                className="w-full mt-5 py-2.5 rounded-xl bg-tng-blue text-white font-semibold text-sm shadow-md"
+              >
+                I&apos;m okay, continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,9 @@
-#Sat Apr 25 21:25:56 MYT 2026
+#Sun Apr 26 00:29:02 MYT 2026
 base.0=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.10=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes 3.dex
-base.11=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/13/classes 2.dex
-base.12=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/15/classes 2.dex
-base.13=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes 2.dex
-base.14=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/7/classes 2.dex
+base.11=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes 2.dex
+base.12=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/7/classes 2.dex
 base.2=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/13/classes.dex
 base.3=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/15/classes.dex
 base.4=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates/dex/debug/mergeProjectDexDebug/2/classes.dex
@@ -17,10 +15,8 @@ base.9=/Users/rylin/Documents/GitHub/tnghack2/watch-app/wear/build/intermediates
 path.0=classes.dex
 path.1=0/classes.dex
 path.10=0/classes 3.dex
-path.11=13/classes 2.dex
-path.12=15/classes 2.dex
-path.13=2/classes 2.dex
-path.14=7/classes 2.dex
+path.11=2/classes 2.dex
+path.12=7/classes 2.dex
 path.2=13/classes.dex
 path.3=15/classes.dex
 path.4=2/classes.dex
@@ -34,8 +30,6 @@ renamed.1=classes2.dex
 renamed.10=classes11.dex
 renamed.11=classes12.dex
 renamed.12=classes13.dex
-renamed.13=classes14.dex
-renamed.14=classes15.dex
 renamed.2=classes3.dex
 renamed.3=classes4.dex
 renamed.4=classes5.dex

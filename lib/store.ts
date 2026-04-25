@@ -17,6 +17,7 @@ export type Screen =
   | "scan"
   | "pay"
   | "pay-donation"
+  | "pay-merchant"
   | "money-packet"
   | "gift"
   | "transfer-receive"
@@ -44,6 +45,7 @@ export type FlowState = {
   recipient?: Recipient;
   amount?: number;
   note: string;
+  merchantName?: string;
 
   balance: number;
   lastReceiptId?: string;
@@ -68,6 +70,7 @@ export type FlowState = {
   setRecipient: (r?: Recipient) => void;
   setAmount: (n?: number) => void;
   setNote: (n: string) => void;
+  setMerchantName: (name?: string) => void;
   setHandoff: (msg?: string) => void;
   setPairCode: (code?: string) => void;
   setShowBalance: (v: boolean) => void;
@@ -107,6 +110,7 @@ export const useApp = create<FlowState>()(
   setRecipient: (r) => set({ recipient: r }),
   setAmount: (n) => set({ amount: n }),
   setNote: (n) => set({ note: n }),
+  setMerchantName: (name) => set({ merchantName: name }),
   setHandoff: (msg) => set({ handoffMessage: msg }),
   setPairCode: (code) => set({ pairCode: code }),
   setShowBalance: (v) => set({ showBalance: v }),

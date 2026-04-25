@@ -33,8 +33,8 @@ export const RECIPIENTS: Recipient[] = [
 // Prior behavior used for anomaly detection
 export const TRANSACTIONS: Transaction[] = [
   { id: "t1", recipientId: "r1", amount: 50, note: "Dinner", date: "2026-04-10T12:00:00Z" },
-  { id: "t2", recipientId: "r1", amount: 45, note: "Lunch", date: "2026-04-15T12:00:00Z" },
-  { id: "t3", recipientId: "r1", amount: 60, note: "Grab share", date: "2026-04-20T12:00:00Z" },
+  { id: "t2", recipientId: "r1", amount: 50, note: "Lunch", date: "2026-04-15T12:00:00Z" },
+  { id: "t3", recipientId: "r1", amount: 50, note: "Grab share", date: "2026-04-20T12:00:00Z" },
   { id: "t4", recipientId: "r4", amount: 20, note: "Kopi", date: "2026-04-18T09:00:00Z" },
   { id: "t5", recipientId: "r5", amount: 150, note: "Gift", date: "2026-04-12T18:00:00Z" },
 ];

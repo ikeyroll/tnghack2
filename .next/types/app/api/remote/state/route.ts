@@ -1,4 +1,4 @@
-// File: C:\Users\MikhailShahmieBinSha\Desktop\TnGHack\tnghack2\app\api\remote\state\route.ts
+// File: /Users/rylin/Documents/GitHub/tnghack2/app/api/remote/state/route.ts
 import * as entry from '../../../../../../app/api/remote/state/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -1,14 +1,14 @@
 "use client";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   Mic, Wifi, WifiOff, ArrowLeft, QrCode as QrIcon, Bell, Wallet, Sparkles,
-  Home, ScanLine, CreditCard, Heart, DollarSign, Send,
-  ShieldAlert, CheckCircle2, Ban, Lock,
+  ShieldAlert, CheckCircle2, Ban, Lock, ChevronLeft, ChevronRight, Heart,
 } from "lucide-react";
 
 type Status = "idle" | "sending" | "ok" | "err";
-type View = "idle" | "listening" | "pay" | "balance" | "notifications" | "sent" | "error" | "guardian";
+type View = "loading" | "menu" | "pay" | "balance" | "notifications" | "tango" | "listening" | "sent" | "error" | "guardian" | "stress";
 
 type GuardianApproval = {
   id: string;
@@ -137,23 +137,42 @@ function interpret(raw: string): Interpreted {
 
 function Controller() {
   const params = useSearchParams();
-  const initialRoom = (params.get("room") || "").toUpperCase();
-  const [room, setRoom] = useState(initialRoom);
-  const [draft, setDraft] = useState(initialRoom);
+  // Default to "DEMO" room for demo purposes
+  const room = (params.get("room") || "DEMO").toUpperCase();
 
-  const [view, setView] = useState<View>("idle");
+  const [view, setView] = useState<View>("loading");
+  const [menuIndex, setMenuIndex] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
   const [heard, setHeard] = useState<string>("");
   const [lastLabel, setLastLabel] = useState<string>("");
+  const [showConnectPopup, setShowConnectPopup] = useState(false);
 
   const [online, setOnline] = useState(true);
   const [now, setNow] = useState<string>("");
   const [state, setState] = useState<RoomState | null>(null);
   const [approval, setApproval] = useState<GuardianApproval | null>(null);
+  const [stress, setStress] = useState<{ bpm: number; reason?: string } | null>(null);
 
   const recogRef = useRef<any>(null);
   const esRef = useRef<EventSource | null>(null);
   const revertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Loading screen → connect popup → menu
+  useEffect(() => {
+    if (view === "loading") {
+      const t1 = setTimeout(() => {
+        setShowConnectPopup(true);
+      }, 1500);
+      const t2 = setTimeout(() => {
+        setShowConnectPopup(false);
+        setView("menu");
+      }, 3000);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [view]);
 
   // Clock
   useEffect(() => {
@@ -191,10 +210,21 @@ function Controller() {
         if (data.cmd === "guardian-approval" && data.payload) {
           setApproval(data.payload as GuardianApproval);
           setView("guardian");
-          // Haptic-like vibration on devices that support it
-          try {
-            (navigator as any).vibrate?.([80, 40, 80]);
-          } catch {}
+          try { (navigator as any).vibrate?.([80, 40, 80]); } catch {}
+        } else if (data.cmd === "guardian-decision") {
+          // Phone made a decision — close watch approval popup if open
+          setApproval(null);
+          setView((cur) => (cur === "guardian" ? "balance" : cur));
+        } else if (data.cmd === "stress-alert" && data.payload) {
+          setStress({
+            bpm: Number(data.payload.bpm) || 124,
+            reason: String(data.payload.reason || ""),
+          });
+          setView("stress");
+          try { (navigator as any).vibrate?.([60, 40, 60, 40, 60]); } catch {}
+        } else if (data.cmd === "stress-clear") {
+          setStress(null);
+          setView((cur) => (cur === "stress" ? "balance" : cur));
         }
       } catch {}
     };
@@ -232,6 +262,9 @@ function Controller() {
   );
 
   // Poll state (balance, notifications) every 3s when paired
+  const lastNotifIdRef = useRef<string | null>(null);
+  const [popupNotif, setPopupNotif] = useState<{ id: string; title: string; body?: string } | null>(null);
+
   useEffect(() => {
     if (!room) return;
     let cancelled = false;
@@ -239,22 +272,35 @@ function Controller() {
       try {
         const res = await fetch(`/api/remote/state?room=${encodeURIComponent(room)}`);
         const s = (await res.json()) as RoomState;
-        if (!cancelled) setState(s);
+        if (!cancelled) {
+          setState(s);
+          // Detect new notifications and show popup
+          const latest = s.notifications?.[0];
+          if (latest && latest.id !== lastNotifIdRef.current) {
+            // First load: just record id, don't popup
+            if (lastNotifIdRef.current !== null) {
+              setPopupNotif(latest);
+              try { (navigator as any).vibrate?.([100, 50, 100]); } catch {}
+              setTimeout(() => setPopupNotif((cur) => (cur?.id === latest.id ? null : cur)), 4000);
+            }
+            lastNotifIdRef.current = latest.id;
+          }
+        }
       } catch {}
     };
     load();
-    const iv = setInterval(load, 3_000);
+    const iv = setInterval(load, 2_000);
     return () => {
       cancelled = true;
       clearInterval(iv);
     };
   }, [room]);
 
-  // Auto-revert some transient views back to idle
+  // Auto-revert some transient views back to menu
   useEffect(() => {
     if (revertTimerRef.current) clearTimeout(revertTimerRef.current);
     if (view === "sent" || view === "error") {
-      revertTimerRef.current = setTimeout(() => setView("idle"), 1600);
+      revertTimerRef.current = setTimeout(() => setView("menu"), 1600);
     }
   }, [view]);
 
@@ -315,12 +361,12 @@ function Controller() {
     r.onresult = (e: any) => {
       const transcript = e.results?.[0]?.[0]?.transcript?.trim();
       if (transcript) handlePhrase(transcript);
-      else setView("idle");
+      else setView("menu");
     };
-    r.onerror = () => setView("idle");
+    r.onerror = () => setView("menu");
     r.onend = () => {
       // If nothing happened, go back to idle
-      setView((v) => (v === "listening" ? "idle" : v));
+      setView((v) => (v === "listening" ? "menu" : v));
     };
     recogRef.current = r;
     setHeard("");
@@ -328,7 +374,7 @@ function Controller() {
     try {
       r.start();
     } catch {
-      setView("idle");
+      setView("menu");
     }
   }, [handlePhrase]);
 
@@ -368,108 +414,261 @@ function Controller() {
               {room && <span className="text-tng-blue font-bold tracking-wider">{room}</span>}
             </div>
 
-            {!room ? (
-              <PairEnter draft={draft} setDraft={setDraft} onPair={() => setRoom(draft.trim())} />
-            ) : view === "idle" ? (
-              <IdleFace onTap={startMic} />
+            {view === "loading" ? (
+              <LoadingFace />
+            ) : showConnectPopup ? (
+              <ConnectPopup />
+            ) : view === "menu" ? (
+              <MenuFace
+                index={menuIndex}
+                setIndex={setMenuIndex}
+                balance={state?.balance ?? null}
+                notifications={state?.notifications ?? []}
+                onTango={startMic}
+              />
             ) : view === "listening" ? (
-              <ListeningFace heard={heard} onCancel={() => { stopMic(); setView("idle"); }} />
+              <ListeningFace heard={heard} onCancel={() => { stopMic(); setView("menu"); }} />
             ) : view === "pay" ? (
-              <PayFace onBack={() => setView("idle")} />
+              <PayFace onBack={() => setView("menu")} />
             ) : view === "balance" ? (
-              <BalanceFace balance={state?.balance ?? null} onBack={() => setView("idle")} />
+              <BalanceFace balance={state?.balance ?? null} onBack={() => setView("menu")} />
             ) : view === "notifications" ? (
-              <NotificationsFace items={state?.notifications ?? []} onBack={() => setView("idle")} />
+              <NotificationsFace items={state?.notifications ?? []} onBack={() => setView("menu")} />
+            ) : view === "tango" ? (
+              <TangoFace onBack={() => setView("menu")} onTap={startMic} heard={heard} />
             ) : view === "guardian" && approval ? (
               <GuardianApprovalFace approval={approval} onDecide={sendDecision} />
+            ) : view === "stress" && stress ? (
+              <StressFace bpm={stress.bpm} reason={stress.reason} />
             ) : view === "sent" ? (
               <SentFace label={lastLabel} />
             ) : (
               <ErrorFace label={lastLabel || "Not understood"} />
             )}
+
+            {/* Notification popup overlay */}
+            {popupNotif && (
+              <button
+                onClick={() => setPopupNotif(null)}
+                className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm animate-in fade-in"
+              >
+                <div className="w-[85%] bg-white rounded-2xl p-3 shadow-2xl">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-6 h-6 rounded-md bg-tng-blue flex items-center justify-center">
+                      <Bell className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold text-tng-blue uppercase tracking-wide">Tango</span>
+                  </div>
+                  <div className="text-xs font-bold text-gray-900 leading-tight">
+                    {popupNotif.title}
+                  </div>
+                  {popupNotif.body && (
+                    <div className="text-[10px] text-gray-600 mt-0.5 leading-snug">
+                      {popupNotif.body}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-2 text-[9px] text-white/60">tap to dismiss</div>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Hint below watch */}
-      {room && (
-        <div className="mt-5 max-w-[340px] text-center text-[11px] text-white/60 leading-relaxed">
-          Tap the watch and say <i>&quot;pay&quot;</i>, <i>&quot;balance&quot;</i>, <i>&quot;notifications&quot;</i> — those run on the watch.<br />
-          Anything else (e.g. <i>&quot;pay RM10 at Kopi Corner&quot;</i>, <i>&quot;open prepaid&quot;</i>) auto-opens on the paired phone.
-        </div>
-      )}
-
-      {/* No-voice demo buttons */}
-      {room && (
-        <div className="mt-3 w-full max-w-[340px]">
-          <div className="text-[10px] text-white/50 text-center mb-2">Demo without voice</div>
-          {/* On-watch actions */}
-          <div className="grid grid-cols-3 gap-2 mb-2">
-            <DemoBtn icon={<QrIcon className="w-4 h-4" />} label="Pay" onClick={() => setView("pay")} />
-            <DemoBtn icon={<Wallet className="w-4 h-4" />} label="Balance" onClick={() => setView("balance")} />
-            <DemoBtn icon={<Bell className="w-4 h-4" />} label="Notifications" onClick={() => setView("notifications")} />
-          </div>
-          {/* Relay to phone */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <DemoBtnSmall icon={<Send className="w-3.5 h-3.5" />} label="Transfer" onClick={() => send("pay-rizwan", { amount: 50 }, "Pay Rizwan RM50")} />
-            <DemoBtnSmall icon={<ScanLine className="w-3.5 h-3.5" />} label="Scan" onClick={() => send("open-scan", null, "Scan")} />
-            <DemoBtnSmall icon={<CreditCard className="w-3.5 h-3.5" />} label="Prepaid" onClick={() => send("open-prepaid", null, "Prepaid")} />
-            <DemoBtnSmall icon={<Heart className="w-3.5 h-3.5" />} label="Donate" onClick={() => send("open-donation", null, "Donation")} />
-            <DemoBtnSmall icon={<DollarSign className="w-3.5 h-3.5" />} label="Loan" onClick={() => send("open-cashloan", null, "CashLoan")} />
-            <DemoBtnSmall icon={<Home className="w-3.5 h-3.5" />} label="Home" onClick={() => send("open-home", null, "Home")} />
-            <DemoBtnSmall icon={<QrIcon className="w-3.5 h-3.5" />} label="Receive" onClick={() => send("open-receive", null, "Receive")} />
-            <DemoBtnSmall icon={<Sparkles className="w-3.5 h-3.5" />} label="Tango" onClick={() => send("show-tango", null, "Tango AI")} />
-          </div>
-        </div>
-      )}
-
-      {room && (
-        <button
-          onClick={() => { setRoom(""); setDraft(""); }}
-          className="mt-3 text-[11px] text-white/40 underline"
-        >
-          Change pair code
-        </button>
-      )}
+      {/* Swipe hint */}
+      <div className="mt-4 text-center text-[10px] text-white/50">
+        Swipe to select · Tap to open
+      </div>
     </div>
   );
 }
 
 /* -------- Faces -------- */
 
-function PairEnter({
-  draft, setDraft, onPair,
-}: { draft: string; setDraft: (s: string) => void; onPair: () => void }) {
+function LoadingFace() {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center">
-      <div className="text-[11px] text-white/60">Enter pair code</div>
-      <input
-        value={draft}
-        onChange={(e) => setDraft(e.target.value.toUpperCase().slice(0, 6))}
-        placeholder="ABCD"
-        className="w-24 text-center bg-zinc-900 border border-zinc-700 rounded-xl px-2 py-1.5 text-xl tracking-widest font-bold outline-none focus:border-tng-blue"
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+      <Image
+        src="/favicon.png"
+        alt="Tango"
+        width={64}
+        height={64}
+        className="animate-pulse"
       />
-      <button
-        onClick={onPair}
-        disabled={!draft.trim()}
-        className="px-4 py-1.5 rounded-full bg-tng-blue text-white text-xs font-semibold disabled:opacity-40"
-      >
-        Pair
-      </button>
+      <div className="text-[11px] text-white/60">Loading...</div>
     </div>
   );
 }
 
-function IdleFace({ onTap }: { onTap: () => void }) {
+function ConnectPopup() {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6">
+      <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+        <Wifi className="w-8 h-8 text-emerald-400" />
+      </div>
+      <div className="text-sm font-semibold text-white">Connected</div>
+      <div className="text-[10px] text-white/60">Phone paired successfully</div>
+    </div>
+  );
+}
+
+type PageId = "balance" | "pay" | "notifications" | "tango";
+const pageOrder: PageId[] = ["balance", "pay", "notifications", "tango"];
+
+function MenuFace({
+  index,
+  setIndex,
+  balance,
+  notifications,
+  onTango,
+}: {
+  index: number;
+  setIndex: (i: number) => void;
+  balance: number | null;
+  notifications: { id: string; ts: number; title: string; body?: string }[];
+  onTango: () => void;
+}) {
+  const pageId = pageOrder[index];
+  const prev = () => setIndex((index - 1 + pageOrder.length) % pageOrder.length);
+  const next = () => setIndex((index + 1) % pageOrder.length);
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
+      {/* Page content */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {pageId === "balance" && <BalancePage balance={balance} />}
+        {pageId === "pay" && <PayPage />}
+        {pageId === "notifications" && <NotificationsPage items={notifications} />}
+        {pageId === "tango" && <TangoPage onTap={onTango} />}
+      </div>
+
+      {/* Left arrow */}
+      <button
+        onClick={prev}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 z-10"
+      >
+        <ChevronLeft className="w-4 h-4 text-white" />
+      </button>
+      {/* Right arrow */}
+      <button
+        onClick={next}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 z-10"
+      >
+        <ChevronRight className="w-4 h-4 text-white" />
+      </button>
+
+      {/* Page dots */}
+      <div className="absolute bottom-6 flex gap-1.5 z-10">
+        {pageOrder.map((_, i) => (
+          <div
+            key={i}
+            className={`w-1.5 h-1.5 rounded-full ${i === index ? "bg-white" : "bg-white/30"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BalancePage({ balance }: { balance: number | null }) {
+  const formatted =
+    balance == null
+      ? "—"
+      : "RM" +
+        balance.toLocaleString("en-MY", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+  return (
+    <div className="flex flex-col items-center text-center px-6">
+      <div className="flex items-center gap-1 text-[10px] text-white/70 mb-2">
+        <Wallet className="w-3 h-3 text-tng-blue" />
+        <span className="font-semibold">Balance</span>
+      </div>
+      <div className="text-[10px] text-white/50">eWallet</div>
+      <div className="text-2xl font-bold mt-0.5 bg-gradient-to-br from-sky-300 to-tng-blue bg-clip-text text-transparent">
+        {formatted}
+      </div>
+      <div className="mt-1 text-[9px] text-white/40">live from your phone</div>
+    </div>
+  );
+}
+
+function PayPage() {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex items-center gap-1 text-[10px] text-white/70 mb-1.5">
+        <QrIcon className="w-3 h-3 text-tng-blue" />
+        <span className="font-semibold">Pay</span>
+      </div>
+      <div className="p-1.5 rounded-xl bg-tng-blue">
+        <div className="bg-white p-1 rounded-lg">
+          <FakeQR size={120} color="#0057d9" />
+        </div>
+      </div>
+      <div className="mt-1.5 text-[9px] text-white/60">show to merchant</div>
+    </div>
+  );
+}
+
+function NotificationsPage({ items }: { items: { id: string; ts: number; title: string; body?: string }[] }) {
+  return (
+    <div className="flex flex-col items-center w-full px-6">
+      <div className="flex items-center gap-1 text-[10px] text-white/70 mb-2">
+        <Bell className="w-3 h-3 text-tng-blue" />
+        <span className="font-semibold">Alerts</span>
+      </div>
+      {items.length === 0 ? (
+        <div className="text-[10px] text-white/40 mt-4">No alerts yet</div>
+      ) : (
+        <div className="w-full space-y-1 max-h-[120px] overflow-y-auto no-scrollbar">
+          {items.slice(0, 4).map((n) => (
+            <div key={n.id} className="bg-white/8 rounded-lg px-2 py-1.5 text-left">
+              <div className="text-[10px] font-semibold text-white truncate">{n.title}</div>
+              {n.body && <div className="text-[9px] text-white/60 truncate">{n.body}</div>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TangoPage({ onTap }: { onTap: () => void }) {
   return (
     <button
       onClick={onTap}
-      className="absolute inset-0 flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+      className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
     >
-      <GeminiSpark size={52} />
-      <div className="text-white/90 text-sm font-medium tracking-wide">Ask Tango</div>
-      <div className="absolute bottom-6 text-[9px] text-white/40">tap to speak</div>
+      <div className="flex items-center gap-1 text-[10px] text-white/70">
+        <Sparkles className="w-3 h-3 text-tng-blue" />
+        <span className="font-semibold">Tango AI</span>
+      </div>
+      <GeminiSpark size={48} />
+      <div className="text-white/90 text-xs font-medium">Ask Tango</div>
+      <div className="text-[9px] text-white/50">tap to speak</div>
     </button>
+  );
+}
+
+function TangoFace({ onBack, onTap, heard }: { onBack: () => void; onTap: () => void; heard: string }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-700 to-indigo-900">
+      <FaceHeader icon={<Sparkles className="w-3 h-3" />} title="Tango AI" onBack={onBack} />
+      <button
+        onClick={onTap}
+        className="flex flex-col items-center gap-3 active:scale-95 transition-transform"
+      >
+        <GeminiSpark size={56} />
+        <div className="text-white/90 text-sm font-medium">Ask Tango</div>
+        <div className="text-[9px] text-white/50">tap to speak</div>
+      </button>
+      {heard && (
+        <div className="absolute bottom-12 text-[10px] text-white/80 px-4 text-center truncate max-w-full">
+          "{heard}"
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -559,16 +758,10 @@ function GuardianApprovalFace({
   approval: GuardianApproval;
   onDecide: (d: "approve" | "block" | "freeze") => void;
 }) {
-  const palette =
-    approval.riskLevel === "critical"
-      ? "from-red-700 to-red-900"
-      : approval.riskLevel === "high"
-      ? "from-amber-700 to-red-800"
-      : "from-tng-blue to-indigo-700";
   return (
-    <div className={`absolute inset-0 bg-gradient-to-br ${palette} flex flex-col items-center pt-9 pb-3 px-4 text-center`}>
+    <div className="absolute inset-0 bg-gradient-to-br from-tng-blue to-indigo-700 flex flex-col items-center pt-9 pb-3 px-4 text-center">
       <div className="flex items-center gap-1 text-[10px] font-semibold text-white/90">
-        <ShieldAlert className="w-3 h-3" /> SUSPICIOUS · RISK {approval.riskScore}
+        <ShieldAlert className="w-3 h-3" /> UNUSUAL · RISK {approval.riskScore}
       </div>
       <div className="mt-1 text-[9px] text-white/70">
         Tango Guardian
@@ -582,29 +775,79 @@ function GuardianApprovalFace({
       <div className="mt-1.5 text-[9px] text-white/85 leading-snug px-1 line-clamp-2">
         {approval.reasons.slice(0, 2).join(" · ")}
       </div>
-      <div className="mt-auto grid grid-cols-3 gap-1.5 w-full">
-        <button
-          onClick={() => onDecide("approve")}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
-        >
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span className="text-[9px] font-bold">Approve</span>
-        </button>
+      <div className="mt-auto grid grid-cols-2 gap-1.5 w-full">
         <button
           onClick={() => onDecide("block")}
-          className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
+          className="bg-white/15 hover:bg-white/25 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5 border border-white/20"
         >
           <Ban className="w-3.5 h-3.5" />
-          <span className="text-[9px] font-bold">Block</span>
+          <span className="text-[10px] font-bold">Reject</span>
         </button>
         <button
-          onClick={() => onDecide("freeze")}
-          className="bg-red-600 hover:bg-red-700 text-white rounded-lg py-1.5 flex flex-col items-center gap-0.5"
+          onClick={() => onDecide("approve")}
+          className="bg-white text-tng-blue rounded-lg py-1.5 flex flex-col items-center gap-0.5 shadow-md"
         >
-          <Lock className="w-3.5 h-3.5" />
-          <span className="text-[9px] font-bold">Freeze</span>
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-bold">Approve</span>
         </button>
       </div>
+    </div>
+  );
+}
+
+function StressFace({ bpm, reason }: { bpm: number; reason?: string }) {
+  return (
+    <div className="absolute inset-0 bg-gradient-to-br from-rose-700 via-rose-600 to-red-800 flex flex-col items-center pt-9 pb-3 px-4 text-center overflow-hidden">
+      {/* Two pulsing aura rings */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className="w-44 h-44 rounded-full bg-white/10"
+          style={{ animation: "stressPulse 1.1s ease-out infinite" }}
+        />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className="w-32 h-32 rounded-full bg-white/15"
+          style={{ animation: "stressPulse 1.1s ease-out 0.35s infinite" }}
+        />
+      </div>
+
+      <div className="flex items-center gap-1 text-[10px] font-semibold text-white/95 z-10">
+        <Heart className="w-3 h-3 fill-white" /> ELEVATED HEART RATE
+      </div>
+      <div className="mt-0.5 text-[9px] text-white/70 z-10">Tango Guardian</div>
+
+      <div className="mt-auto mb-auto z-10 flex flex-col items-center">
+        <div
+          className="relative flex items-center justify-center"
+          style={{ animation: "stressBeat 0.85s ease-in-out infinite" }}
+        >
+          <Heart className="w-16 h-16 text-white fill-white drop-shadow-[0_0_12px_rgba(255,80,80,0.8)]" />
+        </div>
+        <div className="mt-2 flex items-baseline gap-1">
+          <span className="text-3xl font-extrabold text-white leading-none tabular-nums">
+            {bpm}
+          </span>
+          <span className="text-[10px] font-semibold text-white/80">BPM</span>
+        </div>
+      </div>
+
+      <div className="z-10 text-[9px] text-white/85 leading-snug px-2 line-clamp-2 mb-1">
+        {reason || "Take a deep breath before paying."}
+      </div>
+
+      <style jsx>{`
+        @keyframes stressBeat {
+          0%, 100% { transform: scale(1); }
+          15% { transform: scale(1.18); }
+          30% { transform: scale(0.98); }
+          45% { transform: scale(1.12); }
+        }
+        @keyframes stressPulse {
+          0% { transform: scale(0.7); opacity: 0.55; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -625,30 +868,6 @@ function ErrorFace({ label }: { label: string }) {
       <div className="text-rose-400 text-xs">Hmm…</div>
       <div className="text-[10px] text-white/70">{label}</div>
     </div>
-  );
-}
-
-function DemoBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-1 py-2 rounded-xl bg-zinc-900 border border-white/10 active:bg-zinc-800 text-white/90"
-    >
-      <span className="text-tng-blue">{icon}</span>
-      <span className="text-[10px] font-medium">{label}</span>
-    </button>
-  );
-}
-
-function DemoBtnSmall({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-1 py-1.5 rounded-lg bg-zinc-900 border border-white/10 active:bg-zinc-800 text-white/90"
-    >
-      <span className="text-tng-blue">{icon}</span>
-      <span className="text-[9px] font-medium">{label}</span>
-    </button>
   );
 }
 

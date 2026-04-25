@@ -1,39 +1,147 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search, User, Check, Eye, EyeOff, Plus, ChevronRight,
   FileCheck, PieChart, Send, CreditCard, Sparkles,
   Home, ShoppingBag, DollarSign, MapPin, ScanLine,
-<<<<<<< Updated upstream
   Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned, Watch,
-  Coins, Building2, MessageSquare, Gift,
-=======
-  Palmtree, Sunrise, Wallet, Fuel, Heart, MapPinned,
-  Coins, Building2, MessageSquare, Gift, Shield, Lock,
->>>>>>> Stashed changes
+  Coins, Building2, MessageSquare, Gift, AlertTriangle, XCircle, ShieldX,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
-import { WALLET } from "@/lib/db";
 import { fmtRM } from "@/lib/utils";
 import { useGuardian } from "@/lib/guardian";
-import GuardianCenter from "./GuardianCenter";
+
+const DEMO_AMOUNT = 117;
+const DEMO_RECIPIENT = {
+  id: "merchant-yt-premium",
+  name: "Yoga Premium",
+  phone: "Subscription",
+};
 
 export default function WalletHome() {
-<<<<<<< Updated upstream
-  const { balance, setShowTransferSheet, setShowTango, setShowWatchPair, setScreen, showBalance, setShowBalance } = useApp();
-=======
-  const { balance, setShowTransferSheet, setShowTango, setScreen } = useApp();
-  const { walletStatus, deviceTrust, stress } = useGuardian();
-  const [guardianOpen, setGuardianOpen] = useState(false);
-  const stressColor =
-    stress === "high" ? "bg-red-500" : stress === "elevated" ? "bg-amber-400" : "bg-emerald-400";
-  const trustColor =
-    deviceTrust.trustScore >= 80
-      ? "text-emerald-300"
-      : deviceTrust.trustScore >= 50
-      ? "text-amber-300"
-      : "text-red-300";
->>>>>>> Stashed changes
+  const {
+    balance,
+    setShowTransferSheet,
+    setShowTango,
+    setScreen,
+    showBalance,
+    setShowBalance,
+    pairCode,
+    setRecipient,
+    setAmount,
+    setNote,
+    completeProcessing,
+  } = useApp();
+  const { setPendingApproval, pushAudit } = useGuardian();
+  const [showUnauthorizedDemo, setShowUnauthorizedDemo] = useState(false);
+  const [showRejectedModal, setShowRejectedModal] = useState(false);
+
+  const sendWatchDecision = async (decision: "approve" | "block") => {
+    const room = (pairCode || "DEMO").toUpperCase();
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: "guardian-decision",
+          payload: { decision },
+        }),
+      });
+    } catch {}
+  };
+
+  const handleDemoApprove = async () => {
+    setPendingApproval(undefined);
+    pushAudit({ kind: "approved", summary: "Demo: Yoga Premium approved" });
+    setShowUnauthorizedDemo(false);
+    await sendWatchDecision("approve");
+    // Populate transfer state then jump to the receipt screen so the user
+    // sees the same "Transfer successful" UI as a normal payment.
+    setRecipient(DEMO_RECIPIENT as any);
+    setAmount(DEMO_AMOUNT);
+    setNote("Subscription");
+    completeProcessing();
+  };
+
+  const handleDemoReject = async () => {
+    setPendingApproval(undefined);
+    pushAudit({ kind: "blocked", summary: "Demo: Yoga Premium blocked" });
+    setShowUnauthorizedDemo(false);
+    await sendWatchDecision("block");
+    setShowRejectedModal(true);
+  };
+
+  // When the demo modal is open, also react to a decision made on the watch
+  // (RemoteBridge dispatches a window "guardian-decision" CustomEvent).
+  useEffect(() => {
+    if (!showUnauthorizedDemo) return;
+    function onDecision(e: any) {
+      const d = e?.detail?.decision as "approve" | "block" | undefined;
+      if (!d) return;
+      if (d === "approve") {
+        setPendingApproval(undefined);
+        pushAudit({ kind: "approved", summary: "Demo: Yoga Premium approved (watch)" });
+        setShowUnauthorizedDemo(false);
+        setRecipient(DEMO_RECIPIENT as any);
+        setAmount(DEMO_AMOUNT);
+        setNote("Subscription");
+        completeProcessing();
+      } else if (d === "block") {
+        setPendingApproval(undefined);
+        pushAudit({ kind: "blocked", summary: "Demo: Yoga Premium blocked (watch)" });
+        setShowUnauthorizedDemo(false);
+        setShowRejectedModal(true);
+      }
+    }
+    window.addEventListener("guardian-decision", onDecision as any);
+    return () => window.removeEventListener("guardian-decision", onDecision as any);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showUnauthorizedDemo]);
+
+  // Simulate unauthorized payment attempt
+  const triggerUnauthorizedDemo = async () => {
+    const recipientName = "Yoga Premium";
+    const randomAmount = 117.00; // Subscription charge after free trial
+
+    const approval = {
+      id: "demo-" + Date.now(),
+      recipientId: "merchant-yt-premium",
+      recipientName: recipientName,
+      amount: randomAmount,
+      riskScore: 93,
+      riskLevel: "high" as const,
+      reasons: [
+        "Unexpected recurring charge detected",
+        "Amount higher than usual subscription",
+        "First charge after free trial ended",
+      ],
+      createdAt: Date.now(),
+    };
+
+    setPendingApproval(approval);
+    pushAudit({
+      kind: "approval-required",
+      summary: `Unexpected charge: ${fmtRM(randomAmount)} to ${recipientName}`,
+      details: approval,
+    });
+
+    // Send to watch via SSE (default room "DEMO" if not paired)
+    const room = (pairCode || "DEMO").toUpperCase();
+    try {
+      await fetch("/api/remote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room,
+          cmd: "guardian-approval",
+          payload: approval,
+        }),
+      });
+    } catch {}
+
+    setShowUnauthorizedDemo(true);
+  };
   return (
     <div className="h-full w-full bg-[#f2f4f8] flex flex-col no-scrollbar overflow-y-auto">
       {/* Blue header */}
@@ -86,36 +194,91 @@ export default function WalletHome() {
           <button className="text-sm font-semibold flex items-center gap-1">
             Transactions <ChevronRight className="w-4 h-4" />
           </button>
+          <button
+            onClick={triggerUnauthorizedDemo}
+            className="ml-auto px-2.5 py-1 rounded-full bg-red-500/80 text-[10px] font-bold flex items-center gap-1"
+          >
+            <AlertTriangle className="w-3 h-3" /> Demo
+          </button>
         </div>
-
-        {/* Guardian status strip */}
-        <button
-          onClick={() => setGuardianOpen(true)}
-          className="mt-3 w-full flex items-center gap-2 bg-white/10 hover:bg-white/15 active:bg-white/20 rounded-xl px-3 py-2 text-left"
-        >
-          <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
-            {walletStatus === "frozen" ? (
-              <Lock className="w-4 h-4 text-red-200" />
-            ) : (
-              <Shield className="w-4 h-4 text-white" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[12px] font-semibold leading-tight">
-              Tango Guardian {walletStatus === "frozen" ? "· Frozen" : "· Active"}
-            </div>
-            <div className="text-[10px] text-white/80 leading-tight">
-              <span className={trustColor}>Trust {deviceTrust.trustScore}</span>
-              {" · "}
-              <span className="inline-flex items-center gap-1">
-                <span className={`inline-block w-1.5 h-1.5 rounded-full ${stressColor}`} />
-                Stress {stress}
-              </span>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-white/70" />
-        </button>
       </div>
+
+      {/* Unauthorized Payment Demo Modal */}
+      {showUnauthorizedDemo && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden">
+            <div className="bg-gradient-to-r from-tng-blue to-indigo-600 px-4 py-3 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-white" />
+              <span className="text-white font-bold">Unexpected Subscription Charge</span>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-700 mb-3">
+                An unexpected charge for Yoga Premium was detected. This might be a free trial ending.
+              </p>
+              <div className="bg-tng-sky/40 border border-tng-sky rounded-xl p-3 mb-4">
+                <div className="text-xs text-tng-blue font-semibold mb-1">Transaction Details</div>
+                <div className="text-lg font-bold text-gray-900">
+                  {fmtRM(117)}
+                </div>
+                <div className="text-sm text-gray-600">To: Yoga Premium</div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDemoReject}
+                  className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-semibold text-sm"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={handleDemoApprove}
+                  className="flex-1 py-2.5 rounded-xl bg-tng-blue text-white font-semibold text-sm shadow-md"
+                >
+                  Approve
+                </button>
+              </div>
+              <button
+                onClick={() => setShowUnauthorizedDemo(false)}
+                className="w-full mt-2 py-2 text-sm text-gray-500"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejected Confirmation Modal */}
+      {showRejectedModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden">
+            <div className="bg-gradient-to-r from-tng-blue to-indigo-600 px-4 py-3 flex items-center gap-2">
+              <ShieldX className="w-5 h-5 text-white" />
+              <span className="text-white font-bold">Payment Rejected</span>
+            </div>
+            <div className="p-5 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-3">
+                <XCircle className="w-10 h-10 text-red-500" strokeWidth={1.8} />
+              </div>
+              <div className="text-base font-semibold text-gray-900">
+                You blocked this charge
+              </div>
+              <div className="mt-1 text-sm text-gray-600">
+                {fmtRM(117)} to Yoga Premium was not paid.
+              </div>
+              <div className="mt-3 text-[11px] text-gray-500 leading-snug">
+                Tango Guardian will keep watching your subscriptions and alert you the next
+                time an unexpected charge appears.
+              </div>
+              <button
+                onClick={() => setShowRejectedModal(false)}
+                className="w-full mt-5 py-2.5 rounded-xl bg-tng-blue text-white font-semibold text-sm shadow-md"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick actions */}
       <div className="px-4 -mt-3">
@@ -176,22 +339,6 @@ export default function WalletHome() {
         <Sparkles className="w-6 h-6" />
         <span className="absolute -top-1 -right-1 bg-yellow-400 text-[9px] text-black font-bold px-1.5 py-0.5 rounded-full">AI</span>
       </button>
-
-      {/* Guardian Center FAB */}
-      <button
-        onClick={() => setGuardianOpen(true)}
-        className="absolute right-4 bottom-44 w-12 h-12 rounded-full bg-white text-tng-blue border border-gray-200 shadow-xl flex items-center justify-center"
-        aria-label="Open Guardian Center"
-      >
-        <Shield className="w-5 h-5" />
-        <span
-          className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-            walletStatus === "frozen" ? "bg-red-500" : "bg-emerald-500"
-          }`}
-        />
-      </button>
-
-      <GuardianCenter open={guardianOpen} onClose={() => setGuardianOpen(false)} />
 
       {/* Bottom nav */}
       <div className="absolute bottom-0 inset-x-0 bg-white border-t border-gray-200 flex items-center justify-between px-6 py-2 pb-3">

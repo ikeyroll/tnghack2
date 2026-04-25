@@ -18,11 +18,8 @@ import CashLoanScreen from "@/components/CashLoanScreen";
 import ScanScreen from "@/components/ScanScreen";
 import AddMoneyScreen from "@/components/AddMoneyScreen";
 import RemoteBridge from "@/components/RemoteBridge";
-<<<<<<< Updated upstream
 import SmartWatchScreen from "@/components/SmartWatchScreen";
-=======
-import RiskApprovalSheet from "@/components/RiskApprovalSheet";
->>>>>>> Stashed changes
+import MerchantPay from "@/components/MerchantPay";
 import { useApp } from "@/lib/store";
 
 export default function Page() {
@@ -73,6 +70,7 @@ export default function Page() {
               )}
               {screen === "add-money" && <AddMoneyScreen />}
               {screen === "smartwatch" && <SmartWatchScreen />}
+              {screen === "pay-merchant" && <MerchantPay />}
               {/* AuthModal handles its own visibility at screen==="auth" */}
               {screen === "auth" && <TransferMoney />}
             </motion.div>
@@ -82,7 +80,6 @@ export default function Page() {
           <AuthModal />
           <TangoAssistant />
           <RemoteBridge />
-          <RiskApprovalSheet />
 
           {/* Handoff banner from watch */}
           <AnimatePresence>

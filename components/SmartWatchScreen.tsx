@@ -1,9 +1,22 @@
 "use client";
-import { ArrowLeft, Bluetooth, Smartphone, Watch, QrCode } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Bluetooth, Smartphone, QrCode, Shield, ChevronRight } from "lucide-react";
 import { useApp } from "@/lib/store";
+import { useGuardian } from "@/lib/guardian";
+import GuardianCenter from "./GuardianCenter";
 
 export default function SmartWatchScreen() {
   const { setScreen, setShowWatchPair } = useApp();
+  const { walletStatus, deviceTrust, stress } = useGuardian();
+  const [guardianOpen, setGuardianOpen] = useState(false);
+  const stressColor =
+    stress === "high" ? "bg-red-500" : stress === "elevated" ? "bg-amber-400" : "bg-emerald-400";
+  const trustColor =
+    deviceTrust.trustScore >= 80
+      ? "text-emerald-500"
+      : deviceTrust.trustScore >= 50
+      ? "text-amber-500"
+      : "text-red-500";
 
   return (
     <div className="h-full w-full bg-white flex flex-col">
@@ -70,6 +83,29 @@ export default function SmartWatchScreen() {
           <span className="text-sm text-gray-800">Bluetooth connection is required.</span>
         </div>
 
+        {/* Tango Guardian Card */}
+        <button
+          onClick={() => setGuardianOpen(true)}
+          className="mt-4 w-full flex items-center gap-3 bg-gradient-to-r from-tng-blue to-indigo-600 rounded-xl px-4 py-3 text-left shadow-md"
+        >
+          <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-white">
+              Tango Guardian {walletStatus === "frozen" ? "· Frozen" : "· Active"}
+            </div>
+            <div className="text-[11px] text-white/80 flex items-center gap-2">
+              <span className={trustColor}>Trust {deviceTrust.trustScore}</span>
+              <span className="inline-flex items-center gap-1">
+                <span className={`inline-block w-1.5 h-1.5 rounded-full ${stressColor}`} />
+                Stress {stress}
+              </span>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-white/70" />
+        </button>
+
         <div className="flex-1" />
 
         {/* Bottom notes */}
@@ -88,6 +124,8 @@ export default function SmartWatchScreen() {
           Link a smartwatch
         </button>
       </div>
+
+      <GuardianCenter open={guardianOpen} onClose={() => setGuardianOpen(false)} />
     </div>
   );
 }

@@ -49,6 +49,19 @@ export async function POST(req: NextRequest) {
         body: n.body ? String(n.body) : undefined,
       }));
   }
+  // Append a single notification to the list
+  if (body.notification && typeof body.notification.title === "string") {
+    const n = body.notification;
+    s.notifications = [
+      {
+        id: String(n.id ?? `n${Date.now()}`),
+        ts: Number(n.ts ?? Date.now()),
+        title: String(n.title),
+        body: n.body ? String(n.body) : undefined,
+      },
+      ...s.notifications,
+    ].slice(0, 20);
+  }
   s.updatedAt = Date.now();
   return Response.json({ ok: true });
 }

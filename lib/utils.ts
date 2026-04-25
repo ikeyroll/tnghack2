@@ -6,7 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function fmtRM(n: number) {
-  return "RM" + n.toFixed(2);
+  return (
+    "RM" +
+    n.toLocaleString("en-MY", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
 }
 
 export function nowStr() {
