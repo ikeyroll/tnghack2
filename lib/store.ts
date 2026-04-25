@@ -66,6 +66,7 @@ export type FlowState = {
   setHandoff: (msg?: string) => void;
   setPairCode: (code?: string) => void;
   setShowBalance: (v: boolean) => void;
+  deductBalance: (amount: number) => void;
 
   logAction: (entry: Omit<ActionLogEntry, "id" | "ts">) => void;
   clearActionLog: () => void;
@@ -101,6 +102,7 @@ export const useApp = create<FlowState>()(
   setHandoff: (msg) => set({ handoffMessage: msg }),
   setPairCode: (code) => set({ pairCode: code }),
   setShowBalance: (v) => set({ showBalance: v }),
+  deductBalance: (amt) => set((s) => ({ balance: Math.max(0, +(s.balance - amt).toFixed(2)) })),
 
   logAction: (entry) =>
     set((state) => ({
