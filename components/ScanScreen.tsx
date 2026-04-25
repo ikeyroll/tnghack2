@@ -191,6 +191,7 @@ function ScanTab() {
 }
 
 function PayTab({ balance }: { balance: number }) {
+  const { showBalance } = useApp();
   // Refresh hint updates every 60s — cosmetic
   const code = "9480 5858 3058 5033 5999 6799";
   return (
@@ -223,7 +224,7 @@ function PayTab({ balance }: { balance: number }) {
 
       <div className="mt-3 flex items-center justify-between px-1">
         <div className="text-sm text-gray-600">eWallet balance</div>
-        <div className="text-sm font-bold text-gray-900">{fmtRM(balance)}</div>
+        <div className="text-sm font-bold text-gray-900">{showBalance ? fmtRM(balance) : "RM ••••••"}</div>
       </div>
     </div>
   );

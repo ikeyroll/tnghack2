@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { fmtRM } from "@/lib/utils";
 
 export default function TransferMoney() {
-  const { recipient, amount, setAmount, note, setNote, balance, confirmAmount, setScreen } = useApp();
+  const { recipient, amount, setAmount, note, setNote, balance, confirmAmount, setScreen, showBalance } = useApp();
   const [local, setLocal] = useState(amount ? amount.toFixed(2) : "");
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function TransferMoney() {
             />
           </div>
           <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-            You can transfer up to {fmtRM(balance)} <Info className="w-3 h-3 text-tng-blue" />
+            You can transfer up to {showBalance ? fmtRM(balance) : "RM ••••••"} <Info className="w-3 h-3 text-tng-blue" />
           </div>
           {overBalance && (
             <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
