@@ -92,7 +92,7 @@ export default function WalletHome() {
       <div className="px-4 mt-4">
         <div className="text-sm font-semibold text-gray-900">Recommended</div>
         <div className="mt-2 grid grid-cols-4 gap-2">
-          <Shortcut icon={<Watch className="w-6 h-6 text-tng-blue" />} label="Pair Watch" onClick={() => setShowWatchPair(true)} />
+          <Shortcut icon={<Watch className="w-6 h-6 text-tng-blue" />} label="Smartwatch" onClick={() => setShowWatchPair(true)} />
           <Shortcut icon={<Coins className="w-6 h-6 text-yellow-500" />} label="e-Mas" />
           <Shortcut icon={<Wallet className="w-6 h-6 text-emerald-500" />} label="WalletSafe" />
           <Shortcut icon={<Fuel className="w-6 h-6 text-cyan-600" />} label="Petrol" />
