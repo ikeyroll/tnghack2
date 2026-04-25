@@ -405,11 +405,20 @@ function Controller() {
         Tango Watch · voice-first · only Pay / Balance / Notifications run on-watch
       </div>
 
-      {/* Watch body (round) */}
-      <div className="relative">
-        {/* Side button */}
-        <div className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-3 h-14 bg-zinc-700 rounded" />
-        <div className="w-[320px] h-[320px] rounded-full border-[10px] border-zinc-900 shadow-2xl relative bg-zinc-950">
+      {/* Watch body with wristband */}
+      <div className="relative flex flex-col items-center">
+        {/* Top strap */}
+        <div className="w-[120px] h-[80px] bg-gradient-to-b from-zinc-800 via-zinc-850 to-zinc-900 rounded-t-2xl relative">
+          <div className="absolute inset-x-0 bottom-0 h-px bg-zinc-700/50" />
+          <div className="absolute left-1/2 -translate-x-1/2 top-3 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+          <div className="absolute left-1/2 -translate-x-1/2 top-7 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+          <div className="absolute left-1/2 -translate-x-1/2 top-11 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+        </div>
+
+        <div className="relative">
+          {/* Side button */}
+          <div className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-3 h-14 bg-zinc-700 rounded" />
+          <div className="w-[320px] h-[320px] rounded-full border-[10px] border-zinc-900 shadow-2xl relative bg-zinc-950">
           <div className="absolute inset-2 rounded-full bg-black overflow-hidden">
             {/* Top status row */}
             <div className="absolute top-3 inset-x-0 flex items-center justify-center gap-2 text-[10px] text-white/60">
@@ -491,6 +500,15 @@ function Controller() {
               </button>
             )}
           </div>
+        </div>
+        </div>
+
+        {/* Bottom strap */}
+        <div className="w-[120px] h-[80px] bg-gradient-to-t from-zinc-800 via-zinc-850 to-zinc-900 rounded-b-2xl relative">
+          <div className="absolute inset-x-0 top-0 h-px bg-zinc-700/50" />
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-3 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-7 w-16 h-[3px] rounded-full bg-zinc-700/60" />
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-11 w-16 h-[3px] rounded-full bg-zinc-700/60" />
         </div>
       </div>
 
