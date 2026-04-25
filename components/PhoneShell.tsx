@@ -10,7 +10,6 @@ export default function PhoneShell({
 }) {
   return (
     <div className={cn("phone-frame", className)}>
-      <div className="notch" />
       <div className="flex-1 overflow-hidden relative">{children}</div>
     </div>
   );
