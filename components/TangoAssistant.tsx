@@ -375,6 +375,18 @@ export default function TangoAssistant() {
                 {voiceOn ? <Volume2 className="w-4.5 h-4.5" /> : <VolumeX className="w-4.5 h-4.5" />}
               </button>
               <button
+                onClick={() => {
+                  if (confirm("Clear chat?")) {
+                    setMsgs([{ role: "ai", kind: "text", content: "Hi, I'm Tango — your wallet assistant. I can answer FAQs, transfer money, read media  and screenshots, and catch scams. Try a prompt below." }]);
+                  }
+                }}
+                aria-label="Clear chat"
+                title="Clear chat"
+                className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center"
+              >
+                <Trash2 className="w-4.5 h-4.5" />
+              </button>
+              <button
                 onClick={() => setShowHistory(true)}
                 aria-label="History"
                 className="relative w-9 h-9 rounded-full bg-white/15 flex items-center justify-center"
@@ -497,14 +509,6 @@ export default function TangoAssistant() {
                       <div className="font-semibold">Activity history</div>
                       <div className="text-[11px] text-white/80">Everything you&apos;ve done with Tango</div>
                     </div>
-                    {actionLog.length > 0 && (
-                      <button
-                        onClick={() => { if (confirm("Clear all history?")) clearActionLog(); }}
-                        className="text-xs flex items-center gap-1 bg-white/15 px-2.5 py-1 rounded-full"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" /> Clear
-                      </button>
-                    )}
                   </div>
                   <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3">
                     {actionLog.length === 0 ? (
