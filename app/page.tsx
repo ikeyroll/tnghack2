@@ -13,6 +13,7 @@ import TangoAssistant from "@/components/TangoAssistant";
 import WatchSimulator from "@/components/WatchSimulator";
 import PrepaidScreen from "@/components/PrepaidScreen";
 import DonationScreen from "@/components/DonationScreen";
+import DonationPayScreen from "@/components/DonationPayScreen";
 import CashLoanScreen from "@/components/CashLoanScreen";
 import ScanScreen from "@/components/ScanScreen";
 import RemoteBridge from "@/components/RemoteBridge";
@@ -57,6 +58,7 @@ export default function Page() {
               {screen === "watch" && <WatchSimulator />}
               {screen === "prepaid" && <PrepaidScreen />}
               {screen === "donation" && <DonationScreen />}
+              {screen === "pay-donation" && <DonationPayScreen />}
               {screen === "cashloan" && <CashLoanScreen />}
               {(screen === "scan" || screen === "pay" || screen === "receive") && (
                 <ScanScreen

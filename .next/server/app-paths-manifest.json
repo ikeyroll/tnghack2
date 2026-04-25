@@ -1,6 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/tango/route": "app/api/tango/route.js",
   "/page": "app/page.js",
-  "/api/remote/state/route": "app/api/remote/state/route.js"
+  "/api/remote/state/route": "app/api/remote/state/route.js",
+  "/api/analyze-whatsapp/route": "app/api/analyze-whatsapp/route.js"
 }
