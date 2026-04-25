@@ -19,7 +19,8 @@ export type Screen =
   | "pay-donation"
   | "money-packet"
   | "gift"
-  | "transfer-receive";
+  | "transfer-receive"
+  | "add-money";
 
 export type ActionLogEntry = {
   id: string;
@@ -67,6 +68,7 @@ export type FlowState = {
   setPairCode: (code?: string) => void;
   setShowBalance: (v: boolean) => void;
   deductBalance: (amount: number) => void;
+  addBalance: (amount: number) => void;
 
   logAction: (entry: Omit<ActionLogEntry, "id" | "ts">) => void;
   clearActionLog: () => void;
@@ -103,6 +105,7 @@ export const useApp = create<FlowState>()(
   setPairCode: (code) => set({ pairCode: code }),
   setShowBalance: (v) => set({ showBalance: v }),
   deductBalance: (amt) => set((s) => ({ balance: Math.max(0, +(s.balance - amt).toFixed(2)) })),
+  addBalance: (amt) => set((s) => ({ balance: +(s.balance + amt).toFixed(2) })),
 
   logAction: (entry) =>
     set((state) => ({

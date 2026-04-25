@@ -16,6 +16,7 @@ import DonationScreen from "@/components/DonationScreen";
 import DonationPayScreen from "@/components/DonationPayScreen";
 import CashLoanScreen from "@/components/CashLoanScreen";
 import ScanScreen from "@/components/ScanScreen";
+import AddMoneyScreen from "@/components/AddMoneyScreen";
 import RemoteBridge from "@/components/RemoteBridge";
 import { useApp } from "@/lib/store";
 
@@ -65,6 +66,7 @@ export default function Page() {
                   initialTab={screen === "pay" ? "Pay" : screen === "receive" ? "Receive" : "Scan"}
                 />
               )}
+              {screen === "add-money" && <AddMoneyScreen />}
               {/* AuthModal handles its own visibility at screen==="auth" */}
               {screen === "auth" && <TransferMoney />}
             </motion.div>

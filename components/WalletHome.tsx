@@ -58,7 +58,7 @@ export default function WalletHome() {
         </div>
 
         <div className="mt-3 flex items-center gap-3">
-          <button className="px-3 py-1.5 rounded-full border border-white text-sm font-semibold flex items-center gap-1">
+          <button onClick={() => setScreen("add-money")} className="px-3 py-1.5 rounded-full border border-white text-sm font-semibold flex items-center gap-1">
             <Plus className="w-3.5 h-3.5" /> Add money
           </button>
           <button className="text-sm font-semibold flex items-center gap-1">
