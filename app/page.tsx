@@ -18,6 +18,7 @@ import CashLoanScreen from "@/components/CashLoanScreen";
 import ScanScreen from "@/components/ScanScreen";
 import AddMoneyScreen from "@/components/AddMoneyScreen";
 import RemoteBridge from "@/components/RemoteBridge";
+import SmartWatchScreen from "@/components/SmartWatchScreen";
 import { useApp } from "@/lib/store";
 
 export default function Page() {
@@ -67,6 +68,7 @@ export default function Page() {
                 />
               )}
               {screen === "add-money" && <AddMoneyScreen />}
+              {screen === "smartwatch" && <SmartWatchScreen />}
               {/* AuthModal handles its own visibility at screen==="auth" */}
               {screen === "auth" && <TransferMoney />}
             </motion.div>

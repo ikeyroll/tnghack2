@@ -20,7 +20,9 @@ export type Screen =
   | "money-packet"
   | "gift"
   | "transfer-receive"
-  | "add-money";
+  | "add-money"
+  | "smartwatch"
+  | "cashloan";
 
 export type ActionLogEntry = {
   id: string;
